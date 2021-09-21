@@ -42,4 +42,7 @@ export default defineConfig({
       },
     },
   },
+  alias: {
+    'anchor-link': 'underline text-blue-600 hover:text-blue-800 visited:text-purple-600',
+  }
 })
