@@ -13,4 +13,7 @@
   "files.associations": {
     "*.css": "postcss",
   },
+  // "editor.formatOnSave": false,
+  "git.autofetch": false,
+  "github.gitAuthentication": false,
 }

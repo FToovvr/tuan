@@ -1,3 +1,5 @@
+/// <reference types="vue/ref-macros" />
+
 /* eslint-disable import/no-duplicates */
 
 declare interface Window {
