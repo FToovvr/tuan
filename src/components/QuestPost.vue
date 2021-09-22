@@ -28,7 +28,10 @@ let createdAt = $computed(() => {
 </script>
 
 <template lang="pug">
-article.container(w:m="b-2" w:p="x-6 b-3" w:bg="orange-100 dark:cyan-900" class="rounded-md")
+article.container(
+    w:m="b-2" w:p="x-6 b-3" w:bg="orange-100 dark:cyan-900" class="rounded-md"
+    :id="'floor-' + floorNumber"
+    )
 
     div(class="h-2")
 
@@ -46,7 +49,7 @@ article.container(w:m="b-2" w:p="x-6 b-3" w:bg="orange-100 dark:cyan-900" class=
                 span(w:text="xs")
                     | (
                     //- FIXME: alias `anchor-link` 不运作？
-                    a.anchor-link(:href="'#' + floorNumber") \#{{ floorNumber }}
+                    a.anchor-link(:href="'#floor-' + floorNumber") \#{{ floorNumber }}
                     | )
             div(w:clear="both")
             div(class="h-1")
