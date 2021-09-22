@@ -1,7 +1,7 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
 
 import type { Quest } from '~/types/quest'
-import type { RawPostJson } from '~/types/post'
+import { Post, RawPostJson, rawPostToPost } from '~/types/post'
 
 export const useStuffStore = defineStore('stuff', {
   state: () => ({
@@ -9,6 +9,9 @@ export const useStuffStore = defineStore('stuff', {
 
     quests: new Map<string, Quest>(),
     currentQuest: null as Quest | null,
+
+    // QuestPostRefLink inject 获得不到值的 workaround
+    nextRefRelativeDivId: 1,
   }),
   actions: {
 
@@ -30,11 +33,22 @@ export const useStuffStore = defineStore('stuff', {
         folder, name: questName,
         postOwner: 'bb82mcm', // TODO
         posts: null,
+        idFloorLookup: new Map()
       } as Quest)
-      this.quests.set(path, quest)
 
       const data = await (await fetch(`${this.baseUrl}/${path}/data.json`)).json() as RawPostJson[]
-      quest.posts = data
+
+      const posts: Post[] = []
+      const idFloorLookup = new Map<number, number>()
+      data.forEach((rawPost, i) => {
+        const floorNumber = i + 1
+        posts.push(rawPostToPost(rawPost, quest, floorNumber))
+        idFloorLookup.set(rawPost.id, floorNumber)
+      })
+
+      quest.posts = posts
+      quest.idFloorLookup = idFloorLookup
+      this.quests.set(path, quest)
 
       return quest
     }

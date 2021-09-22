@@ -5,6 +5,7 @@ import DOMPurify from 'dompurify'
 
 interface Props {
     content: string
+    refRelativeDivId: number | null
 }
 const props = defineProps<Props>()
 
@@ -16,9 +17,13 @@ let content = $computed(() => {
     const dom = (new DOMParser()).parseFromString(`<div>${cleanedContent}</div>`, 'text/html')
     const rawRefLinks = dom.querySelectorAll('font[color="#789922"]')
     rawRefLinks.forEach((rawRefLink) => {
+        if (!/>>No\.\d+/.test(rawRefLink.textContent!)) {
+            return
+        }
         const refPostId = Number(rawRefLink.textContent!.split('.')[1])
         const refLink = document.createElement('quest-post-ref-link')
         refLink.setAttribute(':post-id', String(refPostId))
+        refLink.setAttribute(':ref-relative-div-id', String(props.refRelativeDivId))
         rawRefLink.parentElement!.replaceChild(refLink, rawRefLink)
     })
     return dom.documentElement.innerHTML

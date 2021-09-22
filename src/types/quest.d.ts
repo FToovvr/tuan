@@ -1,4 +1,4 @@
-import type { RawPostJson } from "./post";
+import type { Post } from "./post";
 
 export interface Quest {
     baseUrl: string
@@ -9,5 +9,8 @@ export interface Quest {
     postOwner: string
 
     // TODO: 分成 fragment，即 Map<number, Post[]>
-    posts: RawPostJson[] | null
+    posts: Post[] | null
+
+    // postId -> floorNumber
+    idFloorLookup: Map<number, number>
 }
