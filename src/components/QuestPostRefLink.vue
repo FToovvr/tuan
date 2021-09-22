@@ -14,7 +14,8 @@ function onClick() {
 
 <template lang="pug">
 span(
-    style="color: #789922; cursor: zoom-in;"
+    style="color: #789922; cursor: zoom-in"
+    w:font="mono" w:text="sm"
     @click="onClick"
 ) >>No.{{ postId }}
 </template>
