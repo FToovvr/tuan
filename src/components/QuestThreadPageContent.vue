@@ -1,22 +1,29 @@
 <script setup lang="ts">
 // import type { Post } from '~/types/post'
 
+import { useStuffStore } from "~/stores/stuff";
+import { rawPostToPost } from "~/types/post";
+
 // type Props = Post
 // const props = defineProps<Props>()
-interface Post {
-    postId: number
-    floorNumber: number
-    createdAtUtc: number
-    userId: string
-    isPostOwner: boolean
-    content: string
-
-    imageUrl?: string
-}
 interface Props {
-    posts: Post[]
+    floorStart: number
+    floorCount: number
 }
-defineProps<Props>()
+const props = defineProps<Props>()
+
+let { floorStart, floorCount } = $(toRefs(props))
+
+const stuffStore = useStuffStore()
+
+let posts = $computed(() => {
+    if (!stuffStore.currentQuest || !stuffStore.currentQuest.posts) {
+        return []
+    }
+    return stuffStore.currentQuest.posts
+        .slice(floorStart - 1, floorStart - 1 + floorCount)
+        .map((post, i) => rawPostToPost(post, stuffStore.currentQuest!, floorStart + i))
+})
 
 </script>
 

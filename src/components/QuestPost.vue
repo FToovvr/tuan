@@ -29,7 +29,7 @@ let createdAt = $computed(() => {
 
 <template lang="pug">
 article.container(
-    w:m="b-2" w:p="x-6 b-3" w:bg="orange-100 dark:cyan-900" class="rounded-md"
+    w:m="y-1.5" w:p="x-6 b-3" w:bg="orange-100 dark:cyan-900" class="rounded-md"
     :id="'floor-' + floorNumber"
     )
 
