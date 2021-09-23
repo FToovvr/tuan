@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import type { Ref } from "vue"
+import type { ComputedRef, Ref, StyleValue } from "vue"
+
+import { isDark } from "~/logic"
 
 interface Props {
     postId: number
@@ -65,12 +67,6 @@ let {
     }
 }($$(refPostAnchorRef), $$(refPostRef), 100))
 
-let isPinned = $ref(false)
-
-function onClick() {
-    isPinned = !isPinned
-}
-
 let refPostHeight = $ref(0)
 watch($$(refPostRef), () => {
     if (!refPostRef) { return }
@@ -80,15 +76,50 @@ watch($$(refPostRef), () => {
     })
 })
 
-let displayStatus = $computed(() => {
+let isPinned = $ref(false)
+let isCollapsed = $ref(false)
+watch($$(isPinned), (isPinned) => { if (!isPinned) { isCollapsed = false } })
+let displayStatus: 'closed' | 'floating' | 'open' | 'collapsed' = $computed(() => {
     if (isPinned) {
-        return 'open'
+        return isCollapsed ? 'collapsed' : 'open'
     }
     if (shouldFloat) {
         return 'floating'
     }
     return 'closed'
 })
+
+function onClick(source: 'link' | 'pin') {
+    if (!isPinned) {
+        isPinned = true
+    } else {
+        if (source === 'link') {
+            isCollapsed = displayStatus === 'collapsed' ? false : true
+            console.log(isCollapsed)
+        } else {
+            isPinned = false
+        }
+    }
+}
+
+let backgroundColor = $ref('#000000')
+let backgroundColorTransparent = $computed(() => backgroundColor + '00')
+// Workaround，直接放在模板里会因为没有识别出是 CSS 变量而报错
+let pinVarStyles = $(computed(() => ({ '--bg-color': backgroundColor, '--bg-color-t': backgroundColorTransparent })) as unknown as ComputedRef<StyleValue>)
+// 总觉得不够优雅：从简的话，应该全局只有一处 `watch`；从繁的话，只观察 `isDark` 是不够的
+watch([isDark, $$(refPostRef)], () => {
+    if (refPostRef) { // LOL
+        // Workaround，由于自身没有 `background-color`
+        const firstChild = refPostRef.firstChild! as HTMLElement
+        const bgRgb = window.getComputedStyle(firstChild).getPropertyValue('background-color')
+        // @ts-ignore
+        // https://stackoverflow.com/a/3627747
+        const rgb2hex = (rgb) => `#${rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0')).join('')}`
+        const bgHex = rgb2hex(bgRgb)
+        backgroundColor = bgHex
+        console.log(backgroundColor)
+    }
+}, { immediate: true, flush: 'post' })
 
 </script>
 
@@ -97,7 +128,7 @@ span(
     style="color: #789922"
     :style="{ cursor: isPinned ? 'zoom-out' : 'zoom-in' }"
     w:font="mono" w:text="sm"
-    @click="onClick" @mouseenter="onHovers.refLink = true" @mouseleave="onHovers.refLink = false"
+    @click="onClick('link')" @mouseenter="onHovers.refLink = true" @mouseleave="onHovers.refLink = false"
 ) >>No.{{ postId }}
 keep-alive
     //- FIXME: 引用视图 A->B->C，C 固定后，只有在鼠标移动到 B 外侧后 A 的高度才更新。
@@ -119,6 +150,8 @@ keep-alive
                         span.pin-button(
                             :data-status="displayStatus"
                             w:text="xs" w:cursor="pointer"
+                            :style="pinVarStyles"
+                            @click="onClick('pin')"
                         ) 📌
                         span(class="px-0.5")
 </template>
@@ -141,13 +174,20 @@ keep-alive
         filter: grayscale(100%);
     }
 
+    &[data-status="collapsed"] {
+        transform: rotate(-225deg);
+    }
     &[data-status="collapsed"]::before {
         content: "";
         position: absolute;
         height: 110%;
         width: 100%;
-        background: linear-gradient(#f0e0d600, #f0e0d6ff);
-        // z-index: $z-index-pin-mask;
+        /* 
+            如果参数是：
+            `v-bind(backgroundColorTransparent), v-bind(backgroundColor)`
+            生成的 CSS 中相应变量会未定义
+        */
+        background: linear-gradient(var(--bg-color), var(--bg-color-t));
         transform: rotate(45deg);
     }
 }

@@ -54,7 +54,7 @@ let createdAt = $computed(() => {
 article.container(
     v-if="post"
     :id="'floor-' + post.floorNumber"
-    w:m="y-1" w:bg="orange-100 dark:cyan-900"
+    w:m="y-1" w:bg="post-background-color dark:post-background-color-dark"
     w:border="1 dark:gray"
     :class="isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6'"
     class="rounded-md"
@@ -62,7 +62,7 @@ article.container(
 
     //- 头部
     div(w:text="sm" class="sticky top-0" style="z-index: 1;")
-        div(w:p="t-1" w:bg="orange-100 dark:cyan-900")
+        div(w:p="t-1" w:bg="post-background-color dark:post-background-color-dark")
             div(w:float="left")
                 //- 作为引用视图时，图钉等操作图标放这里
                 slot(name='head-left')

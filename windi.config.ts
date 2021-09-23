@@ -40,6 +40,11 @@ export default defineConfig({
           },
         },
       },
+
+      colors: {
+        'post-background-color': colors.orange[100],
+        'post-background-color-dark': colors.cyan[900],
+      }
     },
   },
   alias: {
