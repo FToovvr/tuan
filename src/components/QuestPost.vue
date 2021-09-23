@@ -55,8 +55,8 @@ article.container(
     v-if="post"
     :id="'floor-' + post.floorNumber"
     w:m="y-1" w:bg="orange-100 dark:cyan-900"
-    w:border="2 dark:(1 gray)"
-    :class="isRefPost ? 'border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6'"
+    w:border="1 dark:gray"
+    :class="isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6'"
     class="rounded-md"
     )
 
