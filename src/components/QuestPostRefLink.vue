@@ -131,7 +131,6 @@ span(
     @click="onClick('link')" @mouseenter="onHovers.refLink = true" @mouseleave="onHovers.refLink = false"
 ) >>No.{{ postId }}
 keep-alive
-    //- FIXME: 引用视图 A->B->C，C 固定后，只有在鼠标移动到 B 外侧后 A 的高度才更新。
     div.ref-post-anchor(
         v-if="refRelativeDiv && (shouldFloat || isPinned)"
         ref="refPostAnchorRef"
