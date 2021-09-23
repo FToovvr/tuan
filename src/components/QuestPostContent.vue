@@ -5,6 +5,8 @@ import DOMPurify from 'dompurify'
 
 interface Props {
     content: string
+
+    nestLevel: number
     refRelativeDivId: number | null
 }
 const props = defineProps<Props>()
@@ -24,6 +26,8 @@ let content = $computed(() => {
         const refLink = document.createElement('quest-post-ref-link')
         refLink.setAttribute(':post-id', String(refPostId))
         refLink.setAttribute(':ref-relative-div-id', String(props.refRelativeDivId))
+        // nest-level 从 QuestPostRefLink 起加深
+        refLink.setAttribute(':nest-level', String(props.nestLevel + 1))
         rawRefLink.parentElement!.replaceChild(refLink, rawRefLink)
     })
     return dom.documentElement.innerHTML

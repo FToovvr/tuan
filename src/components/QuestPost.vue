@@ -6,9 +6,10 @@ interface Props {
     post?: Post // 帖内容或帖号
     postId?: number
 
-    isRefPost?: boolean
+    nestLevel?: number
 }
 const props = defineProps<Props>()
+let isRefPost = $computed(() => props.nestLevel ?? 0 > 0)
 
 const stuffStore = useStuffStore()
 
@@ -92,7 +93,7 @@ article.container(
         )
             quest-post-image(:image-url="post.imageUrl")
         //- 正文
-        quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId")
+        quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId", :nest-level="nestLevel ?? 0")
     div(w:clear="both")
 
 </template>

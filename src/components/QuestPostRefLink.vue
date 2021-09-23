@@ -4,6 +4,7 @@ import type { Ref } from "vue"
 interface Props {
     postId: number
 
+    nestLevel: number
     refRelativeDivId: number | null
 }
 const props = defineProps<Props>()
@@ -88,14 +89,13 @@ keep-alive
     )   
         //- 为了不感染上 `.prose`
         teleport(:to="refRelativeDiv")
-            //- TODO: max-width 减去的 1em 是不是可以变为 `-(1 + depth * 0.5)em`？`depth` 是嵌套层数。
             div.absolute(
                 ref="refPostRef"
                 @mouseenter="onHovers.refPost = true" @mouseleave="onHovers.refPost = false"
                 style="z-index: 2; width: max-content;"
-                :style="{ maxWidth: `calc(100vw - ${refPostRef?.getBoundingClientRect().left ?? 0}px - 1em)` }"
+                :style="{ maxWidth: `calc(100vw - ${refPostRef?.getBoundingClientRect().left ?? 0}px - ${1 + nestLevel * 0.2}em)` }"
             )
-                quest-post(:post-id="postId" :is-ref-post="true")
+                quest-post(:post-id="postId" :nest-level="nestLevel")
 </template>
 
 <style lang="scss">
