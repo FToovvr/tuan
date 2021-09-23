@@ -10,10 +10,6 @@ const props = defineProps<Props>()
 let postId = $(toRef(props, 'postId'))
 let refRelativeDivId = $(toRef(props, 'refRelativeDivId'))
 
-function onClick() {
-    console.log(postId)
-}
-
 let refRelativeDiv = document.getElementById(`ref-relative-div-${refRelativeDivId}`)
 
 let refPostAnchorRef: HTMLDivElement | null = $ref(null)
@@ -68,18 +64,27 @@ let {
     }
 }($$(refPostAnchorRef), $$(refPostRef), 100))
 
+let isPinned = $ref(false)
+
+function onClick() {
+    isPinned = !isPinned
+}
+
 </script>
 
 <template lang="pug">
 span(
-    style="color: #789922; cursor: zoom-in"
+    style="color: #789922"
+    :style="{ cursor: isPinned ? 'zoom-out' : 'zoom-in' }"
     w:font="mono" w:text="sm"
     @click="onClick" @mouseenter="onHovers.refLink = true" @mouseleave="onHovers.refLink = false"
 ) >>No.{{ postId }}
 keep-alive
+    //- FIXME: 引用视图 A->B->C，C 固定后，只有在鼠标移动到 B 外侧后 A 的高度才更新。
     div.ref-post-anchor(
-        v-if="refRelativeDiv && shouldFloat"
+        v-if="refRelativeDiv && (shouldFloat || isPinned)"
         ref="refPostAnchorRef"
+        :style="{ height: isPinned ? `${refPostRef?.clientHeight}px` : 0 }"
     )   
         //- 为了不感染上 `.prose`
         teleport(:to="refRelativeDiv")
