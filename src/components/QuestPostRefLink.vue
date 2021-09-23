@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// import type { Ref } from "vue"
+import type { Ref } from "vue"
 
 interface Props {
     postId: number
@@ -14,28 +14,35 @@ function onClick() {
     console.log(postId)
 }
 
-// let refRelativeDiv: Ref<HTMLDivElement> | null = inject('ref-relative-div', null)
-let refRelativeDiv = $computed(() => {
-    if (refRelativeDivId) {
-        return document.getElementById(`ref-relative-div-${refRelativeDivId}`)
-    }
-    return null
-})
+let refRelativeDiv = document.getElementById(`ref-relative-div-${refRelativeDivId}`)
+
+let refPostAnchorRef: HTMLDivElement | null = $ref(null)
+let refPostRef: HTMLDivElement | null = $ref(null)
 
 // 悬浮的引用视图
 let {
-    onHovers, onHover,
-    refPostAnchorRef, refPostRef
-} = $(function useHover() {
+    onHovers, shouldFloat,
+} = $(function useFloat(
+    _refPostAnchorRef: Ref<HTMLDivElement | null>, _refPostRef: Ref<HTMLDivElement | null>,
+    unfloatDelay: number = 100,
+) {
+    let refPostAnchorRef = $(_refPostAnchorRef)
+    let refPostRef = $(_refPostRef)
 
     let onHovers = $ref({
         refLink: false,
         refPost: false,
     })
     let onHover = $computed(() => onHovers.refLink || onHovers.refPost)
-
-    let refPostAnchorRef: null | HTMLDivElement = $ref(null)
-    let refPostRef: null | HTMLDivElement = $ref(null)
+    let justLeaved = $ref(false)
+    watch($$(onHover), async (newValue) => {
+        if (newValue === false) {
+            justLeaved = true
+            await new Promise((r) => setTimeout(r, unfloatDelay))
+            justLeaved = false
+        }
+    })
+    let shouldFloat = $computed(() => onHover || justLeaved)
 
     let _divSize = $ref({ width: 0, height: 0 })
     onMounted(() => {
@@ -57,10 +64,9 @@ let {
     })
 
     return {
-        onHovers: $$(onHovers), onHover: $$(onHover),
-        refPostAnchorRef: $$(refPostAnchorRef), refPostRef: $$(refPostRef)
+        onHovers: $$(onHovers), shouldFloat: $$(shouldFloat),
     }
-}())
+}($$(refPostAnchorRef), $$(refPostRef), 100))
 
 </script>
 
@@ -72,7 +78,7 @@ span(
 ) >>No.{{ postId }}
 keep-alive
     div.ref-post-anchor(
-        v-if="refRelativeDiv && onHover"
+        v-if="refRelativeDiv && shouldFloat"
         ref="refPostAnchorRef"
     )   
         //- 为了不感染上 `.prose`
