@@ -77,9 +77,10 @@ watch($$(refPostRef), () => {
 })
 
 // TODO: 应该总共只计算一次，而不是每个组件实例都计算一次
+// TODO: 高度的值应该固定在某处，而不是同时硬编码在这里和 QuestPost.vue 中 `article.container` 的 `:class` 绑定中
 // https://stackoverflow.com/a/42769683
-// 5rem
-const collapseSize = 5 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+// 24rem
+const collapseSize = 24 / 4.0 * parseFloat(getComputedStyle(document.documentElement).fontSize)
 
 let isPinned = $ref(false)
 let isCollapsed = $ref(false)

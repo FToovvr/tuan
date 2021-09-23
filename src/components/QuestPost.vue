@@ -52,14 +52,16 @@ let createdAt = $computed(() => {
 </script>
 
 <template lang="pug">
-article.container(
+article.container.relative(
     v-if="post"
     :id="'floor-' + post.floorNumber"
     w:m="y-1" w:bg="post-background-color dark:post-background-color-dark"
     w:border="1 dark:gray"
-    :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (props.isCollapsed ? 'max-h-20 overflow-hidden' : '')"
+    :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (props.isCollapsed ? 'max-h-24 overflow-hidden' : '')"
     class="rounded-md"
     )
+
+    div.mask-wrapper(v-if="isCollapsed")
 
     //- 头部
     div(w:text="sm" class="sticky top-0" style="z-index: 1;")
@@ -98,6 +100,21 @@ article.container(
             quest-post-image(:image-url="post.imageUrl")
         //- 正文
         quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId", :nest-level="nestLevel ?? 0")
+
     div(w:clear="both")
 
 </template>
+
+<style scoped lang="scss">
+// https://github.com/FToovvr/adnmb-reference-enhancement.user.js/blob/master/src/style/style.scss
+.mask-wrapper::before {
+    content: "";
+    position: absolute;
+    top: calc(100% - 20px);
+    left: 0;
+    height: 20px;
+    width: 100%;
+    background: linear-gradient(#f0e0d600, #ffeeddcc);
+    z-index: 1;
+}
+</style>
