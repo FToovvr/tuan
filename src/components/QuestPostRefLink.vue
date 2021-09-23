@@ -71,6 +71,15 @@ function onClick() {
     isPinned = !isPinned
 }
 
+let refPostHeight = $ref(0)
+watch($$(refPostRef), () => {
+    if (!refPostRef) { return }
+    refPostHeight = refPostRef.clientHeight ?? 0
+    useResizeObserver(refPostRef, (entries) => {
+        refPostHeight = entries[0].contentRect.height
+    })
+})
+
 </script>
 
 <template lang="pug">
@@ -85,7 +94,7 @@ keep-alive
     div.ref-post-anchor(
         v-if="refRelativeDiv && (shouldFloat || isPinned)"
         ref="refPostAnchorRef"
-        :style="{ height: isPinned ? `${refPostRef?.clientHeight}px` : 0 }"
+        :style="{ height: isPinned ? `${refPostHeight}px` : 0 }"
     )   
         //- 为了不感染上 `.prose`
         teleport(:to="refRelativeDiv")
