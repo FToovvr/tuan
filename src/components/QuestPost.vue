@@ -61,16 +61,18 @@ article.container(
     )
 
     //- 头部
-    div(w:font="mono" w:text="sm" class="sticky top-0" style="z-index: 1;")
+    div(w:text="sm" class="sticky top-0" style="z-index: 1;")
         div(w:p="t-1" w:bg="orange-100 dark:cyan-900")
             div(w:float="left")
+                //- 作为引用视图时，图钉等操作图标放这里
+                slot(name='head-left')
                 //- PO
-                span(:class="post.isPostOwner ? 'font-black' : 'font-normal'") {{ post.userId }}
-                |
+                span(w:font="mono" :class="post.isPostOwner ? 'font-black' : 'font-normal'") {{ post.userId }}
+                span(class="px-1.5")
                 //- 发串时间
-                | {{ createdAt }}
+                span(w:font="mono") {{ createdAt }}
                 span(class="px-3")
-            div(w:float="right")
+            div(w:font="mono" w:float="right")
                 span No.{{ post.postId }}
                 span(w:text="xs")
                     | (

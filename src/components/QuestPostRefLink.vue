@@ -80,6 +80,16 @@ watch($$(refPostRef), () => {
     })
 })
 
+let displayStatus = $computed(() => {
+    if (isPinned) {
+        return 'open'
+    }
+    if (shouldFloat) {
+        return 'floating'
+    }
+    return 'closed'
+})
+
 </script>
 
 <template lang="pug">
@@ -105,10 +115,40 @@ keep-alive
                 :style="{ maxWidth: `calc(100vw - ${refPostRef?.getBoundingClientRect().left ?? 0}px - ${1 + nestLevel * 0.2}em)` }"
             )
                 quest-post(:post-id="postId" :nest-level="nestLevel")
+                    template(#head-left)
+                        span.pin-button(
+                            :data-status="displayStatus"
+                            w:text="xs" w:cursor="pointer"
+                        ) 📌
+                        span(class="px-0.5")
 </template>
 
 <style lang="scss">
 .ref-post-anchor + br {
     display: none;
+}
+</style>
+
+<style lang="scss" scoped>
+// https://github.com/FToovvr/adnmb-reference-enhancement.user.js/blob/master/src/style/style.scss
+.pin-button {
+    display: inline-block;
+    transform: rotate(-45deg);
+
+    &[data-status="floating"] {
+        // https://codemyui.com/grayscale-emoji-using-css/
+        transform: none;
+        filter: grayscale(100%);
+    }
+
+    &[data-status="collapsed"]::before {
+        content: "";
+        position: absolute;
+        height: 110%;
+        width: 100%;
+        background: linear-gradient(#f0e0d600, #f0e0d6ff);
+        // z-index: $z-index-pin-mask;
+        transform: rotate(45deg);
+    }
 }
 </style>
