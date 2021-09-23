@@ -95,12 +95,13 @@ let displayStatus: 'closed' | 'floating' | 'open' | 'collapsed' = $computed(() =
     return 'closed'
 })
 
+let isCollapsible = $computed(() => refPostHeight > collapseSize)
 function onClick(source: 'link' | 'pin') {
     if (!isPinned) {
         isPinned = true
     } else {
         if (source === 'link') {
-            if (refPostHeight <= collapseSize) {
+            if (!isCollapsible) {
                 return
             }
             isCollapsed = displayStatus === 'collapsed' ? false : true
@@ -134,7 +135,7 @@ watch([isDark, $$(refPostRef)], () => {
 <template lang="pug">
 span(
     style="color: #789922"
-    :style="{ cursor: isPinned ? 'zoom-out' : 'zoom-in' }"
+    :style="{ cursor: (displayStatus === 'open') ? (isCollapsible ? 'zoom-out' : '') : 'zoom-in' }"
     w:font="mono" w:text="sm"
     @click="onClick('link')" @mouseenter="onHovers.refLink = true" @mouseleave="onHovers.refLink = false"
 ) >>No.{{ postId }}
