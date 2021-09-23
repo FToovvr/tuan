@@ -83,10 +83,12 @@ keep-alive
     )   
         //- 为了不感染上 `.prose`
         teleport(:to="refRelativeDiv")
+            //- TODO: max-width 减去的 1em 是不是可以变为 `-(1 + depth * 0.5)em`？`depth` 是嵌套层数。
             div.absolute(
                 ref="refPostRef"
                 @mouseenter="onHovers.refPost = true" @mouseleave="onHovers.refPost = false"
-                style="z-index: 2;"
+                style="z-index: 2; width: max-content;"
+                :style="{ maxWidth: `calc(100vw - ${refPostRef?.getBoundingClientRect().left ?? 0}px - 1em)` }"
             )
                 quest-post(:post-id="postId" :is-ref-post="true")
 </template>
