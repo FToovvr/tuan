@@ -52,13 +52,11 @@ let createdAt = $computed(() => {
 article.container(
     v-if="post"
     :id="'floor-' + post.floorNumber"
-    w:m="y-1" w:p="x-6 b-3" w:bg="orange-100 dark:cyan-900"
+    w:m="y-1" w:bg="orange-100 dark:cyan-900"
     w:border="2 dark:(1 gray)"
-    :class="isRefPost ? 'border-gray-400' : ''"
+    :class="isRefPost ? 'border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6'"
     class="rounded-md"
     )
-
-    div(class="h-2")
 
     //- 头部
     div(w:font="mono" w:text="sm" class="sticky top-0" style="z-index: 1;")
@@ -83,7 +81,7 @@ article.container(
 
             hr(w:m="x-0.5" w:border="dashed gray-400")
 
-    div(class="h-3")
+    div(:class="isRefPost ? 'h-1' : 'h-3'")
 
     //- 正文（+附图）
     div.relative(ref="postContentDiv")
@@ -96,7 +94,5 @@ article.container(
         //- 正文
         quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId")
     div(w:clear="both")
-
-    div(class="h-1")
 
 </template>
