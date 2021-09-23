@@ -76,6 +76,11 @@ watch($$(refPostRef), () => {
     })
 })
 
+// TODO: 应该总共只计算一次，而不是每个组件实例都计算一次
+// https://stackoverflow.com/a/42769683
+// 5rem
+const collapseSize = 5 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+
 let isPinned = $ref(false)
 let isCollapsed = $ref(false)
 watch($$(isPinned), (isPinned) => { if (!isPinned) { isCollapsed = false } })
@@ -94,8 +99,10 @@ function onClick(source: 'link' | 'pin') {
         isPinned = true
     } else {
         if (source === 'link') {
+            if (refPostHeight <= collapseSize) {
+                return
+            }
             isCollapsed = displayStatus === 'collapsed' ? false : true
-            console.log(isCollapsed)
         } else {
             isPinned = false
         }
@@ -144,7 +151,7 @@ keep-alive
                 style="z-index: 2; width: max-content;"
                 :style="{ maxWidth: `calc(100vw - ${refPostRef?.getBoundingClientRect().left ?? 0}px - ${1 + nestLevel * 0.2}em)` }"
             )
-                quest-post(:post-id="postId" :nest-level="nestLevel")
+                quest-post(:post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed")
                     template(#head-left)
                         span.pin-button(
                             :data-status="displayStatus"

@@ -7,6 +7,7 @@ interface Props {
     postId?: number
 
     nestLevel?: number
+    isCollapsed?: boolean
 }
 const props = defineProps<Props>()
 let isRefPost = $computed(() => props.nestLevel ?? 0 > 0)
@@ -56,7 +57,7 @@ article.container(
     :id="'floor-' + post.floorNumber"
     w:m="y-1" w:bg="post-background-color dark:post-background-color-dark"
     w:border="1 dark:gray"
-    :class="isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6'"
+    :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (props.isCollapsed ? 'max-h-20 overflow-hidden' : '')"
     class="rounded-md"
     )
 
