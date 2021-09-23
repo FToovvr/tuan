@@ -32,6 +32,8 @@ let post = $((() => {
     return computed(() => {
         const floorNumber = stuffStore.currentQuest!.idFloorLookup.get(props.postId!)!
         if (!floorNumber) {
+            //- TODO: 处理 post 不存在的情况
+            console.debug(`串 ${props.postId} 不存在于数据中`)
             return null
         }
         return stuffStore.currentQuest!.posts![floorNumber - 1]
@@ -49,7 +51,6 @@ let createdAt = $computed(() => {
 </script>
 
 <template lang="pug">
-//- TODO: 处理 post 不存在的情况
 article.container(
     v-if="post"
     :id="'floor-' + post.floorNumber"
