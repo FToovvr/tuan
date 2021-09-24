@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { ComputedRef, StyleValue } from "vue"
 
 import type { Post } from "~/types/post"
 import { useStuffStore } from "~/stores/stuff"
@@ -55,9 +54,6 @@ let createdAt = $computed(() => {
 })
 
 let backgroundColor = $(useBackgroundColor(computed(() => postContentDiv?.parentElement ?? null)))
-let backgroundColorTransparent = $computed(() => backgroundColor + '00')
-// Workaround，直接放在模板里会因为没有识别出是 CSS 变量而报错
-let pinVarStyles = $(computed(() => ({ '--bg-color': backgroundColor, '--bg-color-t': backgroundColorTransparent })) as unknown as ComputedRef<StyleValue>)
 
 function onClick(ev: Event) {
     if (props.isCollapsed) {
@@ -78,10 +74,10 @@ article.quest-post.container.relative(
     class="rounded-md"
 )
 
-    div.mask-wrapper(
+    overflow-mask(
         v-if="isCollapsed"
         @click.capture="onClick"
-        :style="pinVarStyles"
+        :background-color-rgb-hex="backgroundColor"
     )
 
     //- 头部
@@ -125,18 +121,3 @@ article.quest-post.container.relative(
     div(w:clear="both")
 
 </template>
-
-<style scoped lang="scss">
-// https://github.com/FToovvr/adnmb-reference-enhancement.user.js/blob/master/src/style/style.scss
-.mask-wrapper::before {
-    --mask-height: 2rem;
-    content: "";
-    position: absolute;
-    top: calc(100% - var(--mask-height));
-    left: 0;
-    height: var(--mask-height);
-    width: 100%;
-    background: linear-gradient(var(--bg-color-t), var(--bg-color));
-    z-index: 3;
-}
-</style>
