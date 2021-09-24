@@ -97,7 +97,9 @@ let displayStatus: 'closed' | 'floating' | 'open' | 'collapsed' = $computed(() =
 })
 
 let isCollapsible = $computed(() => refPostHeight > collapseSize)
+let eagersToCollapse = $ref(false) // 在有交互前，如果高度允许折叠则折叠
 function onClick(source: 'link' | 'pin') {
+    eagersToCollapse = false
     if (!isPinned) {
         isPinned = true
     } else {
@@ -112,14 +114,22 @@ function onClick(source: 'link' | 'pin') {
     }
 }
 
+watch($$(refPostHeight), () => {
+    if (eagersToCollapse && isCollapsible) {
+        isCollapsed = true
+        eagersToCollapse = false
+    }
+})
+
 // 第一层的引用视图自动固定并折叠
-// FIXME: 如果包含图片，引用视图最后将只会固定
 onMounted(() => {
     if (props.nestLevel === 1) {
         isPinned = true
         nextTick(() => {
             if (isCollapsible) {
                 isCollapsed = true
+            } else {
+                eagersToCollapse = true
             }
         })
     }
