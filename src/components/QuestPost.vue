@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import type { ComputedRef, StyleValue } from "vue"
+
 import type { Post } from "~/types/post"
 import { useStuffStore } from "~/stores/stuff"
+import { useBackgroundColor } from "~/logic/backgroundColor"
 
 interface Props {
     post?: Post // 帖内容或帖号
@@ -49,6 +52,11 @@ let createdAt = $computed(() => {
     return `${datePart} ${timePart}`
 })
 
+let backgroundColor = $(useBackgroundColor(computed(() => postContentDiv?.parentElement ?? null)))
+let backgroundColorTransparent = $computed(() => backgroundColor + '00')
+// Workaround，直接放在模板里会因为没有识别出是 CSS 变量而报错
+let pinVarStyles = $(computed(() => ({ '--bg-color': backgroundColor, '--bg-color-t': backgroundColorTransparent })) as unknown as ComputedRef<StyleValue>)
+
 </script>
 
 <template lang="pug">
@@ -61,7 +69,7 @@ article.container.relative(
     class="rounded-md"
     )
 
-    div.mask-wrapper(v-if="isCollapsed")
+    div.mask-wrapper(v-if="isCollapsed" :style="pinVarStyles")
 
     //- 头部
     div(w:text="sm" class="sticky top-0" style="z-index: 1;")
@@ -114,7 +122,7 @@ article.container.relative(
     left: 0;
     height: 20px;
     width: 100%;
-    background: linear-gradient(#f0e0d600, #ffeeddcc);
+    background: linear-gradient(var(--bg-color-t), var(--bg-color));
     z-index: 1;
 }
 </style>

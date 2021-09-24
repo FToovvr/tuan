@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComputedRef, Ref, StyleValue } from "vue"
 
-import { isDark } from "~/logic"
+import { useBackgroundColor } from "~/logic/backgroundColor"
 
 interface Props {
     postId: number
@@ -111,24 +111,10 @@ function onClick(source: 'link' | 'pin') {
     }
 }
 
-let backgroundColor = $ref('#000000')
+let backgroundColor = $(useBackgroundColor(computed(() => refPostRef?.firstElementChild as HTMLElement ?? null)))
 let backgroundColorTransparent = $computed(() => backgroundColor + '00')
 // Workaround，直接放在模板里会因为没有识别出是 CSS 变量而报错
 let pinVarStyles = $(computed(() => ({ '--bg-color': backgroundColor, '--bg-color-t': backgroundColorTransparent })) as unknown as ComputedRef<StyleValue>)
-// 总觉得不够优雅：从简的话，应该全局只有一处 `watch`；从繁的话，只观察 `isDark` 是不够的
-watch([isDark, $$(refPostRef)], () => {
-    if (refPostRef) { // LOL
-        // Workaround，由于自身没有 `background-color`
-        const firstChild = refPostRef.firstChild! as HTMLElement
-        const bgRgb = window.getComputedStyle(firstChild).getPropertyValue('background-color')
-        // @ts-ignore
-        // https://stackoverflow.com/a/3627747
-        const rgb2hex = (rgb) => `#${rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0')).join('')}`
-        const bgHex = rgb2hex(bgRgb)
-        backgroundColor = bgHex
-        console.log(backgroundColor)
-    }
-}, { immediate: true, flush: 'post' })
 
 </script>
 
