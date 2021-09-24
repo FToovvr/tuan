@@ -16,7 +16,6 @@ export function useBackgroundColor(_elRef: Ref<HTMLElement | null> | ComputedRef
         // https://stackoverflow.com/a/3627747
         const rgb2hex = (rgb) => `#${rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/).slice(1).map(n => parseInt(n, 10).toString(16).padStart(2, '0')).join('')}`
         const bgHex = rgb2hex(bgRgb)
-        console.log(bgHex)
         backgroundColor = bgHex
     }, { immediate: true, flush: 'post' })
 
