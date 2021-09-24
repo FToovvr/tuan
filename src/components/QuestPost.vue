@@ -116,11 +116,12 @@ article.container.relative(
 <style scoped lang="scss">
 // https://github.com/FToovvr/adnmb-reference-enhancement.user.js/blob/master/src/style/style.scss
 .mask-wrapper::before {
+    --mask-height: 2rem;
     content: "";
     position: absolute;
-    top: calc(100% - 20px);
+    top: calc(100% - var(--mask-height));
     left: 0;
-    height: 20px;
+    height: var(--mask-height);
     width: 100%;
     background: linear-gradient(var(--bg-color-t), var(--bg-color));
     z-index: 3;
