@@ -67,7 +67,7 @@ function onClick(ev: Event) {
 <template lang="pug">
 article.quest-post.container.relative(
     v-if="post"
-    :id="'floor-' + post.floorNumber"
+    :id="'id-' + post.postId"
     w:m="y-1" w:bg="post-background-color dark:post-background-color-dark"
     w:border="1 dark:gray"
     :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (props.isCollapsed ? 'max-h-24 overflow-hidden' : '')"
@@ -97,7 +97,7 @@ article.quest-post.container.relative(
                 span(w:text="xs")
                     | (
                     //- FIXME: alias `anchor-link` 不运作？
-                    a.anchor-link(:href="'#floor-' + post.floorNumber") \#{{ post.floorNumber }}
+                    a.anchor-link(:href="'#id-' + post.postId") \#{{ post.floorNumber }}
                     | )
             div(w:clear="both")
             div(class="h-1")
