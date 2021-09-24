@@ -33,7 +33,6 @@ onMounted(() => {
 
 let imageMaxHeight = $computed(() => currentImageSize.width * 2)
 let imageMaxHeightCssValue = $computed(() => `${imageMaxHeight}px`)
-watch([$$(currentImageSize), $$(imageMaxHeight)], () => console.log(currentImageSize.height, imageMaxHeight))
 
 </script>
 
