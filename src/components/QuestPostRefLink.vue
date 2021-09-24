@@ -111,6 +111,17 @@ function onClick(source: 'link' | 'pin') {
     }
 }
 
+onMounted(() => {
+    if (props.nestLevel === 1) {
+        isPinned = true
+        nextTick(() => {
+            if (isCollapsible) {
+                isCollapsed = true
+            }
+        })
+    }
+})
+
 let backgroundColor = $(useBackgroundColor(computed(() => refPostRef?.firstElementChild as HTMLElement ?? null)))
 let backgroundColorTransparent = $computed(() => backgroundColor + '00')
 // Workaround，直接放在模板里会因为没有识别出是 CSS 变量而报错
