@@ -139,7 +139,10 @@ keep-alive
                 style="z-index: 2; width: max-content;"
                 :style="{ maxWidth: `calc(100vw - ${refPostRef?.getBoundingClientRect().left ?? 0}px - ${1 + nestLevel * 0.2}em)` }"
             )
-                quest-post(:post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed")
+                quest-post(
+                    :post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed"
+                    @expand="onClick('link')"
+                )
                     template(#head-left)
                         span.pin-button(
                             :data-status="displayStatus"

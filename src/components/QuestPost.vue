@@ -15,6 +15,8 @@ interface Props {
 const props = defineProps<Props>()
 let isRefPost = $computed(() => props.nestLevel ?? 0 > 0)
 
+const emit = defineEmits(['expand'])
+
 const stuffStore = useStuffStore()
 
 let postContentDiv: HTMLDivElement | null = $ref(null)
@@ -57,6 +59,13 @@ let backgroundColorTransparent = $computed(() => backgroundColor + '00')
 // Workaround，直接放在模板里会因为没有识别出是 CSS 变量而报错
 let pinVarStyles = $(computed(() => ({ '--bg-color': backgroundColor, '--bg-color-t': backgroundColorTransparent })) as unknown as ComputedRef<StyleValue>)
 
+function onClick(ev: Event) {
+    if (props.isCollapsed) {
+        emit('expand')
+        ev.stopPropagation()
+    }
+}
+
 </script>
 
 <template lang="pug">
@@ -67,6 +76,7 @@ article.container.relative(
     w:border="1 dark:gray"
     :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (props.isCollapsed ? 'max-h-24 overflow-hidden' : '')"
     class="rounded-md"
+    @click.capture="onClick"
     )
 
     div.mask-wrapper(v-if="isCollapsed" :style="pinVarStyles")
