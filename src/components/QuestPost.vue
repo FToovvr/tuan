@@ -76,10 +76,13 @@ article.container.relative(
     w:border="1 dark:gray"
     :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (props.isCollapsed ? 'max-h-24 overflow-hidden' : '')"
     class="rounded-md"
-    @click.capture="onClick"
-    )
+)
 
-    div.mask-wrapper(v-if="isCollapsed" :style="pinVarStyles")
+    div.mask-wrapper(
+        v-if="isCollapsed"
+        @click.capture="onClick"
+        :style="pinVarStyles"
+    )
 
     //- 头部
     div(w:text="sm" class="sticky top-0" style="z-index: 1;")
@@ -109,7 +112,10 @@ article.container.relative(
     div(:class="isRefPost ? 'h-1' : 'h-3'")
 
     //- 正文（+附图）
-    div.relative(ref="postContentDiv")
+    div.relative(
+        ref="postContentDiv"
+        @click.capture="onClick"
+    )
         //- 附图（右侧）
         div(
             v-if="post.imageUrl"
