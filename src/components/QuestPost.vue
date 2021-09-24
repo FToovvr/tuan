@@ -123,6 +123,6 @@ article.container.relative(
     height: 20px;
     width: 100%;
     background: linear-gradient(var(--bg-color-t), var(--bg-color));
-    z-index: 1;
+    z-index: 3;
 }
 </style>
