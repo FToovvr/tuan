@@ -112,6 +112,8 @@ function onClick(source: 'link' | 'pin') {
     }
 }
 
+// 第一层的引用视图自动固定并折叠
+// FIXME: 如果包含图片，引用视图最后将只会固定
 onMounted(() => {
     if (props.nestLevel === 1) {
         isPinned = true

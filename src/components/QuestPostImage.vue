@@ -4,6 +4,8 @@ import { remToPx } from "~/logic/units"
 
 interface Props {
     imageUrl: string
+
+    backgroundColorRgbHex: string
 }
 const props = defineProps<Props>()
 props // 省得报错「未使用」
@@ -15,7 +17,6 @@ let mode: "thumbnail" | "expanded" = $ref("thumbnail")
 function onClick() {
     mode = (mode === "thumbnail" ? "expanded" : "thumbnail")
     if (mode === 'thumbnail') {
-        console.log(figureRef!.getBoundingClientRect())
         if (figureRef!.getBoundingClientRect().top < 0) {
             figureRef!.closest(".quest-post")!.scrollIntoView()
             window.scrollBy(0, remToPx(-2))
@@ -23,16 +24,29 @@ function onClick() {
     }
 }
 
+let currentImageSize = $ref({ width: 0, height: 0 })
+onMounted(() => {
+    useResizeObserver(figureRef!.querySelector('img'), (entries) => {
+        currentImageSize = entries[0].contentRect
+    })
+})
+
+let imageMaxHeight = $computed(() => currentImageSize.width * 2)
+let imageMaxHeightCssValue = $computed(() => `${imageMaxHeight}px`)
+watch([$$(currentImageSize), $$(imageMaxHeight)], () => console.log(currentImageSize.height, imageMaxHeight))
+
 </script>
 
 <template lang="pug">
-//- TODO: 长度大量超过正文时，应该隐藏超出的部分（渐隐效果）
-//- 例：55 页第二张图
-figure(
+figure.relative(
     ref="figureRef"
     :data-mode="mode"
     @click="onClick"
 )
+    overflow-mask(
+        v-if="mode === 'thumbnail' && currentImageSize.height > imageMaxHeight"
+        :background-color-rgb-hex="backgroundColorRgbHex"
+    )
     img(:src="imageUrl" loading="lazy")
 </template>
 
@@ -42,6 +56,8 @@ figure {
         cursor: zoom-in;
         float: right;
         width: min(100%, max(6rem, calc(100% / 3)));
+        max-height: v-bind(imageMaxHeightCssValue);
+        overflow: hidden;
     }
     &[data-mode="expanded"] {
         cursor: zoom-out;

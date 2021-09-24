@@ -114,7 +114,7 @@ article.quest-post.container.relative(
     )
         //- 附图（右侧）
         div(v-if="post.imageUrl")
-            quest-post-image(:image-url="post.imageUrl")
+            quest-post-image(:image-url="post.imageUrl" :background-color-rgb-hex="backgroundColor")
         //- 正文
         quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId", :nest-level="nestLevel ?? 0")
 
