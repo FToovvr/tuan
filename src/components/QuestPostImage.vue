@@ -34,9 +34,23 @@ onMounted(() => {
 let imageMaxHeight = $computed(() => currentImageSize.width * 2)
 let imageMaxHeightCssValue = $computed(() => `${imageMaxHeight}px`)
 
+// TODO: improve
+let message: string | null = $ref(null)
+function onImageLoaded() { message = null }
+onMounted(() => {
+    figureRef!.querySelector('img')!.onerror = (ev) => {
+        if (typeof ev === 'string') {
+            message = `图片加载失败：${ev}`
+        } else {
+            message = `图片加载失败！`
+        }
+    }
+})
+
 </script>
 
 <template lang="pug">
+span(v-if="message !== null" w:float="right") {{ message }}
 figure.relative(
     ref="figureRef"
     :data-mode="mode"
@@ -46,7 +60,10 @@ figure.relative(
         v-if="mode === 'thumbnail' && currentImageSize.height > imageMaxHeight"
         :background-color-rgb-hex="backgroundColorRgbHex"
     )
-    img(:src="imageUrl" loading="lazy")
+    img(
+        :src="imageUrl" loading="lazy"
+        @load="onImageLoaded"
+    )
 </template>
 
 <style scoped lang="scss">
