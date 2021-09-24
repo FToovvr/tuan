@@ -69,7 +69,7 @@ function onClick(ev: Event) {
 </script>
 
 <template lang="pug">
-article.container.relative(
+article.quest-post.container.relative(
     v-if="post"
     :id="'floor-' + post.floorNumber"
     w:m="y-1" w:bg="post-background-color dark:post-background-color-dark"
@@ -117,10 +117,7 @@ article.container.relative(
         @click.capture="onClick"
     )
         //- 附图（右侧）
-        div(
-            v-if="post.imageUrl"
-            w:float="right"
-        )
+        div(v-if="post.imageUrl")
             quest-post-image(:image-url="post.imageUrl")
         //- 正文
         quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId", :nest-level="nestLevel ?? 0")

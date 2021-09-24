@@ -2,6 +2,7 @@
 import type { ComputedRef, Ref, StyleValue } from "vue"
 
 import { useBackgroundColor } from "~/logic/backgroundColor"
+import { remToPx } from "~/logic/units"
 
 interface Props {
     postId: number
@@ -80,7 +81,7 @@ watch($$(refPostRef), () => {
 // TODO: 高度的值应该固定在某处，而不是同时硬编码在这里和 QuestPost.vue 中 `article.container` 的 `:class` 绑定中
 // https://stackoverflow.com/a/42769683
 // 24 = 6rem
-const collapseSize = 24 / 4.0 * parseFloat(getComputedStyle(document.documentElement).fontSize)
+const collapseSize = remToPx(24 / 4.0)
 
 let isPinned = $ref(false)
 let isCollapsed = $ref(false)
