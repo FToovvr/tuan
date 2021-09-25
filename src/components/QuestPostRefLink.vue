@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ComputedRef, Ref, StyleValue } from "vue"
+import type { Ref } from "vue"
 
 import { useStuffStore } from "~/stores/stuff"
 import { useBackgroundColor } from "~/logic/backgroundColor"
@@ -140,9 +140,6 @@ onMounted(() => {
 })
 
 let backgroundColor = $(useBackgroundColor(computed(() => refPostRef?.firstElementChild as HTMLElement ?? null)))
-let backgroundColorTransparent = $computed(() => backgroundColor + '00')
-// Workaround，直接放在模板里会因为没有识别出是 CSS 变量而报错
-let pinVarStyles = $(computed(() => ({ '--bg-color': backgroundColor, '--bg-color-t': backgroundColorTransparent })) as unknown as ComputedRef<StyleValue>)
 
 </script>
 
@@ -172,12 +169,17 @@ keep-alive
                     @expand="onClick('link')"
                 )
                     template(#head-left)
-                        span.pin-button(
-                            :data-status="displayStatus"
-                            w:text="xs" w:cursor="pointer"
-                            :style="pinVarStyles"
-                            @click="onClick('pin')"
-                        ) 📌
+                        div.inline-block.relative
+                            overflow-mask(
+                                v-if="isCollapsed"
+                                @click="onClick('pin')" w:cursor="pointer"
+                                height="1em" :background-color-rgb-hex="backgroundColor"
+                            )
+                            span.pin-button(
+                                :data-status="displayStatus"
+                                w:text="xs"
+                                @click="onClick('pin')" w:cursor="pointer"
+                            ) 📌
                         span(class="px-0.5")
 </template>
 
@@ -201,19 +203,6 @@ keep-alive
 
     &[data-status="collapsed"] {
         transform: rotate(-225deg);
-    }
-    &[data-status="collapsed"]::before {
-        content: "";
-        position: absolute;
-        height: 110%;
-        width: 100%;
-        /* 
-            如果参数是：
-            `v-bind(backgroundColorTransparent), v-bind(backgroundColor)`
-            生成的 CSS 中相应变量会未定义
-        */
-        background: linear-gradient(var(--bg-color), var(--bg-color-t));
-        transform: rotate(45deg);
     }
 }
 </style>
