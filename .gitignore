@@ -7,8 +7,6 @@ dist-ssr
 node_modules
 .idea/
 *.log
-components.d.ts
-auto-imports.d.ts
 
 # 数据之后会存储在单独的 Repo 中
 /public/assets/data
