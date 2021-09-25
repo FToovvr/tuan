@@ -42,5 +42,6 @@ div(class="max-w-2xl mx-auto")
         | 
         button(@click="currentPageNumber++") ++
     hr
-    quest-thread-page-content(:props="{ type: 'page', page: currentPageNumber }")
+    quest-thread-page-viewer(:page-start="currentPageNumber" :page-end="currentPageNumber" :page-current="currentPageNumber")
+    div(w:m="b-8")
 </template>

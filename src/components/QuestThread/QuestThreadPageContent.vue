@@ -65,6 +65,8 @@ onMounted(() => {
                 span(w:font="mono") {{ computedProps.description }}
             .dash
 
+    div(w:h="2")
+
     .post-list(
         ref="postListRef"
         w:space="y-1"

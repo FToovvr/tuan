@@ -19,6 +19,7 @@ declare module 'vue' {
     QuestPostImage: typeof import('./components/QuestPost/QuestPostImage.vue')['default']
     QuestPostRefLink: typeof import('./components/QuestPost/QuestPostRefLink.vue')['default']
     QuestThreadPageContent: typeof import('./components/QuestThread/QuestThreadPageContent.vue')['default']
+    QuestThreadPageViewer: typeof import('./components/QuestThread/QuestThreadPageViewer.vue')['default']
     README: typeof import('./components/README.md')['default']
   }
 }
