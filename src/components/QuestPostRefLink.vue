@@ -115,7 +115,8 @@ let {
     })
 
     let isCollapsible = $computed(() => fullHeight > collapseSize)
-    let eagersToCollapse = $ref(false) // 在有交互前，如果高度允许折叠则折叠
+    // 如果为真，在有交互前，如果高度允许折叠则折叠
+    let eagersToCollapse = $ref(false)
     function onClick(source: 'link' | 'pin') {
         eagersToCollapse = false
         if (!isPinned) {
@@ -141,7 +142,7 @@ let {
 }(collapseSize, $$(refPostFullHeight)))
 
 
-watch($$(refPostHeight), () => {
+watch($$(refPostFullHeight), () => {
     if (eagersToCollapse && isCollapsible) {
         isCollapsed = true
         eagersToCollapse = false
@@ -149,7 +150,6 @@ watch($$(refPostHeight), () => {
 })
 
 // 让第一层引用视图自动固定并折叠
-// FIXME: 偶尔有图片的时候折叠会失效？
 onMounted(() => {
     if (props.nestLevel === 1) {
         isPinned = true
