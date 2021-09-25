@@ -100,7 +100,6 @@ let displayStatus: 'closed' | 'floating' | 'open' | 'collapsed' = $computed(() =
 })
 
 let isCollapsible = $computed(() => refPostHeight > collapseSize)
-// FIXME: 处于 eager 模式的引用视图，如果展开其内部的引用视图，会导致其折叠
 let eagersToCollapse = $ref(false) // 在有交互前，如果高度允许折叠则折叠
 function onClick(source: 'link' | 'pin') {
     eagersToCollapse = false
@@ -160,7 +159,7 @@ keep-alive
         teleport(:to="refRelativeDiv")
             div.absolute(
                 ref="refPostRef"
-                @mouseenter="onHovers.refPost = true" @mouseleave="onHovers.refPost = false"
+                @mouseenter="onHovers.refPost = true, eagersToCollapse = false" @mouseleave="onHovers.refPost = false"
                 style="z-index: 2; width: max-content;"
                 :style="{ maxWidth: `calc(${(stuffStore.rootPostWidth ?? 0)}px - ${1.5 /* TODO: 不该 hardcode */ * nestLevel}rem - ${nestLevel * 0.2}rem)` }"
             )
