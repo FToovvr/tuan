@@ -185,7 +185,7 @@ keep-alive
                 ref="refPostRef"
                 @mouseenter="onHovers.refPost = true, eagersToCollapse = false" @mouseleave="onHovers.refPost = false"
                 style="z-index: 2; width: max-content;"
-                :style="{ maxWidth: `calc(${(stuffStore.rootPostWidth ?? 0)}px - ${1.5 /* TODO: 不该 hardcode */ * nestLevel}rem - ${nestLevel * 0.2}rem)` }"
+                :style="{ maxWidth: `calc(${(stuffStore.rootPostWidth ?? 0)}px - ${0.75 + 0.75 /* TODO: 不该 hardcode */ * nestLevel}rem - ${nestLevel * 0.2}rem)` }"
             )
                 quest-post(
                     :post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed"
