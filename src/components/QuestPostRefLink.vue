@@ -149,14 +149,14 @@ span(
     @click="onClick('link')" @mouseenter="onHovers.refLink = true" @mouseleave="onHovers.refLink = false"
 ) >>No.{{ postId }}
 keep-alive
-    div.ref-post-anchor(
+    .ref-post-anchor(
         v-if="refRelativeDiv && (shouldFloat || isPinned)"
         ref="refPostAnchorRef"
         :style="{ height: isPinned ? `${refPostHeight}px` : 0 }"
     )   
         //- 为了不感染上 `.prose`
         teleport(:to="refRelativeDiv")
-            div.absolute(
+            .absolute(
                 ref="refPostRef"
                 @mouseenter="onHovers.refPost = true, eagersToCollapse = false" @mouseleave="onHovers.refPost = false"
                 style="z-index: 2; width: max-content;"
@@ -167,7 +167,7 @@ keep-alive
                     @expand="onClick('link')"
                 )
                     template(#head-left)
-                        div.inline-block.relative
+                        .inline-block.relative
                             overflow-mask(
                                 v-if="isCollapsed"
                                 @click="onClick('pin')" w:cursor="pointer"

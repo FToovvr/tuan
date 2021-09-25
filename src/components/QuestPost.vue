@@ -80,7 +80,7 @@ article.quest-post.container.relative(
 
     //- 头部
     div(w:text="sm" class="sticky top-0" style="z-index: 1;")
-        div.quest-post-head(w:p="t-1")
+        .quest-post-head(w:p="t-1")
             div(w:float="left")
                 //- 作为引用视图时，图钉等操作图标放这里
                 slot(name='head-left')
@@ -106,7 +106,7 @@ article.quest-post.container.relative(
     div(:class="isRefPost ? 'h-1' : 'h-3'")
 
     //- 正文（+附图）
-    div.relative(
+    .relative(
         ref="postContentDiv"
         @click.capture="onClick"
     )

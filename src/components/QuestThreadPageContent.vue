@@ -33,7 +33,7 @@ onMounted(() => {
 </script>
 
 <template lang="pug">
-div.post-list(ref="postListRef")
+.post-list(ref="postListRef")
     template(v-for="post in posts" :key="post.postId")
         quest-post(:post="post")
 </template>
