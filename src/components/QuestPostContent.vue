@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import QuestPostRefLink from './QuestPostRefLink.vue'
+import type { FunctionalComponent } from '@vue/runtime-core'
 
 import DOMPurify from 'dompurify'
+
+import QuestPostRefLink from './QuestPostRefLink.vue'
+
 
 interface Props {
     content: string
@@ -32,13 +35,19 @@ let content = $computed(() => {
     })
     return dom.documentElement.querySelector('body')!.innerHTML
 })
+
+// 没找到要怎么为 `component(:is=…)` 设置编译选项，那就这么办了…
+const inDev = process.env.NODE_ENV !== 'production'
+const fontElem: FunctionalComponent | undefined = inDev ? (
+    (props, context) => h('font', context.attrs, context.slots.default!())
+) : undefined
 </script>
 
 <template lang="pug">
 .prose(w:text="left")
     div(w:whitespace="pre-line" w:leading="snug")
         template(v-if="hasRefLink")
-            component(:is="{ template: content, components: { QuestPostRefLink } }")
+            component(:is="{ template: content, components: { QuestPostRefLink, ...(inDev ? { font: fontElem } : null) } }")
         template(v-else)
             div(v-html="cleanedContent")
 </template>
