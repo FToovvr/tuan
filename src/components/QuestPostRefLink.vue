@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ComputedRef, Ref, StyleValue } from "vue"
 
+import { useStuffStore } from "~/stores/stuff"
 import { useBackgroundColor } from "~/logic/backgroundColor"
 import { remToPx } from "~/logic/units"
 
@@ -18,6 +19,8 @@ let refRelativeDiv = document.getElementById(`ref-relative-div-${refRelativeDivI
 
 let refPostAnchorRef: HTMLDivElement | null = $ref(null)
 let refPostRef: HTMLDivElement | null = $ref(null)
+
+let stuffStore = useStuffStore()
 
 // 悬浮的引用视图
 let {
@@ -97,6 +100,7 @@ let displayStatus: 'closed' | 'floating' | 'open' | 'collapsed' = $computed(() =
 })
 
 let isCollapsible = $computed(() => refPostHeight > collapseSize)
+// FIXME: 处于 eager 模式的引用视图，如果展开其内部的引用视图，会导致其折叠
 let eagersToCollapse = $ref(false) // 在有交互前，如果高度允许折叠则折叠
 function onClick(source: 'link' | 'pin') {
     eagersToCollapse = false
@@ -161,7 +165,7 @@ keep-alive
                 ref="refPostRef"
                 @mouseenter="onHovers.refPost = true" @mouseleave="onHovers.refPost = false"
                 style="z-index: 2; width: max-content;"
-                :style="{ maxWidth: `calc(100vw - ${refPostRef?.getBoundingClientRect().left ?? 0}px - ${1 + nestLevel * 0.2}em)` }"
+                :style="{ maxWidth: `calc(${(stuffStore.rootPostWidth ?? 0)}px - ${1.5 /* TODO: 不该 hardcode */ * nestLevel}rem - ${nestLevel * 0.2}rem)` }"
             )
                 quest-post(
                     :post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed"

@@ -10,6 +10,9 @@ export const useStuffStore = defineStore('stuff', {
     quests: new Map<string, Quest>(),
     currentQuest: null as Quest | null,
 
+    // 最外层帖的宽度
+    rootPostWidth: 0,
+
     // QuestPostRefLink inject 获得不到值的 workaround
     nextRefRelativeDivId: 1,
   }),

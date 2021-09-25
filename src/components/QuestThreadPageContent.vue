@@ -23,10 +23,17 @@ let posts = $computed(() => {
         .slice(floorStart - 1, floorStart - 1 + floorCount)
 })
 
+let postListRef = $ref(null)
+onMounted(() => {
+    useResizeObserver($$(postListRef), (entries) => {
+        stuffStore.rootPostWidth = entries[0].contentRect.width
+    })
+})
+
 </script>
 
 <template lang="pug">
-div
+div.post-list(ref="postListRef")
     template(v-for="post in posts" :key="post.postId")
         quest-post(:post="post")
 </template>
