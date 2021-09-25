@@ -28,7 +28,7 @@ let offsetStart = $computed(() => (currentPageNumber - 1) * 19)
 
 <template lang="pug">
 div(class="max-w-2xl mx-auto")
-    | {{ folder }} {{ quest }} {{ page }}
+    | {{ folder }} {{ quest }} {{ currentPageNumber }}
     hr
     div
         | 页数:
