@@ -2,7 +2,7 @@
 import type { Ref } from "vue"
 
 import { useStuffStore } from "~/stores/stuff"
-import { useBackgroundColor } from "~/logic/backgroundColor"
+import { postBackgroundColor } from "~/logic/backgroundColor"
 import { remToPx } from "~/logic/units"
 
 interface Props {
@@ -138,7 +138,6 @@ onMounted(() => {
     }
 })
 
-let backgroundColor = $(useBackgroundColor(computed(() => refPostRef?.firstElementChild as HTMLElement ?? null)))
 
 </script>
 
@@ -172,7 +171,7 @@ keep-alive
                             overflow-mask(
                                 v-if="isCollapsed"
                                 @click="onClick('pin')" w:cursor="pointer"
-                                height="1em" :background-color-rgb-hex="backgroundColor"
+                                height="1em" :background-color-rgb-hex="postBackgroundColor"
                             )
                             span.pin-button(
                                 :data-status="displayStatus"

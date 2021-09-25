@@ -2,7 +2,7 @@
 
 import type { Post } from "~/types/post"
 import { useStuffStore } from "~/stores/stuff"
-import { useBackgroundColor } from "~/logic/backgroundColor"
+import { postBackgroundColor } from "~/logic/backgroundColor"
 
 interface Props {
     post?: Post // 帖内容或帖号
@@ -53,8 +53,6 @@ let createdAt = $computed(() => {
     return `${datePart} ${timePart}`
 })
 
-let backgroundColor = $(useBackgroundColor(computed(() => postContentDiv?.parentElement ?? null)))
-
 function onClick(ev: Event) {
     if (props.isCollapsed) {
         emit('expand')
@@ -68,7 +66,7 @@ function onClick(ev: Event) {
 article.quest-post.container.relative(
     v-if="post"
     :id="'id-' + post.postId"
-    w:m="y-1" w:bg="post-background-color dark:post-background-color-dark"
+    w:m="y-1"
     w:border="1 dark:gray"
     :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (props.isCollapsed ? 'max-h-24 overflow-hidden' : '')"
     class="rounded-md"
@@ -77,12 +75,12 @@ article.quest-post.container.relative(
     overflow-mask(
         v-if="isCollapsed"
         @click.capture="onClick"
-        :background-color-rgb-hex="backgroundColor"
+        :background-color-rgb-hex="postBackgroundColor"
     )
 
     //- 头部
     div(w:text="sm" class="sticky top-0" style="z-index: 1;")
-        div(w:p="t-1" w:bg="post-background-color dark:post-background-color-dark")
+        div.quest-post-head(w:p="t-1")
             div(w:float="left")
                 //- 作为引用视图时，图钉等操作图标放这里
                 slot(name='head-left')
@@ -114,10 +112,17 @@ article.quest-post.container.relative(
     )
         //- 附图（右侧）
         div(v-if="post.imageUrl")
-            quest-post-image(:image-url="post.imageUrl" :background-color-rgb-hex="backgroundColor")
+            quest-post-image(:image-url="post.imageUrl" :background-color-rgb-hex="postBackgroundColor")
         //- 正文
         quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId", :nest-level="nestLevel ?? 0")
 
     div(w:clear="both")
 
 </template>
+
+<style scoped lang="scss">
+.quest-post,
+.quest-post-head {
+    background-color: v-bind(postBackgroundColor);
+}
+</style>
