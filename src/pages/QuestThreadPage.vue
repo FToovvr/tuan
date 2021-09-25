@@ -27,7 +27,7 @@ watch($$(currentPageNumber), () => {
 
 <template lang="pug">
 div(class="max-w-2xl mx-auto")
-    | {{ folder }} {{ quest }} {{ currentPageNumber }}
+    | {{ folder }} > {{ quest }}
     hr
     div
         | 页数:
