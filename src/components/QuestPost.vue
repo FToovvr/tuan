@@ -32,7 +32,7 @@ onMounted(() => {
 
 let post = $((() => {
     if (props.post) {
-        return computed(() => props.post as Post)
+        return toRef(props, 'post')
     }
     return computed(() => {
         const floorNumber = stuffStore.currentQuest!.idFloorLookup.get(props.postId!)!
