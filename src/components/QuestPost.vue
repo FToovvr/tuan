@@ -71,51 +71,53 @@ article.quest-post.container.relative(
     class="rounded-md"
 )
 
-    overflow-mask(
-        v-if="isCollapsed"
-        @click.capture="onClick"
-        :background-color-rgb-hex="postBackgroundColor"
-    )
+    .quest-post-wrapper
 
-    //- 头部
-    div(w:text="sm" class="sticky top-0" style="z-index: 1;")
-        .quest-post-head(w:p="t-1")
-            div(w:float="left")
-                //- 作为引用视图时，图钉等操作图标放这里
-                slot(name='head-left')
-                //- PO
-                span(w:font="mono" :class="post.isPostOwner ? 'font-black' : 'font-normal'") {{ post.userId }}
-                span(class="px-1.5")
-                //- 发串时间
-                span(w:font="mono") {{ createdAt }}
-                span(class="px-3")
-            div(w:font="mono" w:float="right")
-                span No.{{ post.postId }}
-                span(w:text="xs")
-                    | (
-                    //- FIXME: alias `anchor-link` 不运作？
-                    a.anchor-link(:href="'#id-' + post.postId") \#{{ post.floorNumber }}
-                    | )
-            div(w:clear="both")
-            div(class="h-1")
-            //- TODO: 标题和名称
+        overflow-mask(
+            v-if="isCollapsed"
+            @click.capture="onClick"
+            :background-color-rgb-hex="postBackgroundColor"
+        )
 
-            hr(w:m="x-0.5" w:border="dashed gray-400")
+        //- 头部
+        div(w:text="sm" class="sticky top-0" style="z-index: 1;")
+            .quest-post-head(w:p="t-1")
+                div(w:float="left")
+                    //- 作为引用视图时，图钉等操作图标放这里
+                    slot(name='head-left')
+                    //- PO
+                    span(w:font="mono" :class="post.isPostOwner ? 'font-black' : 'font-normal'") {{ post.userId }}
+                    span(class="px-1.5")
+                    //- 发串时间
+                    span(w:font="mono") {{ createdAt }}
+                    span(class="px-3")
+                div(w:font="mono" w:float="right")
+                    span No.{{ post.postId }}
+                    span(w:text="xs")
+                        | (
+                        //- FIXME: alias `anchor-link` 不运作？
+                        a.anchor-link(:href="'#id-' + post.postId") \#{{ post.floorNumber }}
+                        | )
+                div(w:clear="both")
+                div(class="h-1")
+                //- TODO: 标题和名称
 
-    div(:class="isRefPost ? 'h-1' : 'h-3'")
+                hr(w:m="x-0.5" w:border="dashed gray-400")
 
-    //- 正文（+附图）
-    .relative(
-        ref="postContentDiv"
-        @click.capture="onClick"
-    )
-        //- 附图（右侧）
-        div(v-if="post.imageUrl")
-            quest-post-image(:image-url="post.imageUrl" :background-color-rgb-hex="postBackgroundColor")
-        //- 正文
-        quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId", :nest-level="nestLevel ?? 0")
+        div(:class="isRefPost ? 'h-1' : 'h-3'")
 
-    div(w:clear="both")
+        //- 正文（+附图）
+        .relative(
+            ref="postContentDiv"
+            @click.capture="onClick"
+        )
+            //- 附图（右侧）
+            div(v-if="post.imageUrl")
+                quest-post-image(:image-url="post.imageUrl" :background-color-rgb-hex="postBackgroundColor")
+            //- 正文
+            quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId", :nest-level="nestLevel ?? 0")
+
+        div(w:clear="both")
 
 </template>
 

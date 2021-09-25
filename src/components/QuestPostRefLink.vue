@@ -71,13 +71,22 @@ let {
     }
 }($$(refPostAnchorRef), $$(refPostRef), 100))
 
+// 帖当前的高度（不包含由于折叠被隐藏的高度）
 let refPostHeight = $ref(0)
+// 帖整体的高度（包含由于折叠被隐藏的高度）
+let refPostFullHeight = $ref(0)
 watch($$(refPostRef), () => {
     if (!refPostRef) { return }
-    refPostHeight = refPostRef.clientHeight ?? 0
-    useResizeObserver(refPostRef, (entries) => {
-        refPostHeight = entries[0].contentRect.height
-    })
+
+    for (const { heightRef, el } of [
+        { heightRef: $$(refPostHeight), el: refPostRef },
+        { heightRef: $$(refPostFullHeight), el: refPostRef.querySelector('.quest-post-wrapper')! as unknown as HTMLElement },
+    ]) {
+        heightRef.value = el.clientHeight ?? 0
+        useResizeObserver(el, (entries) => {
+            heightRef.value = entries[0].contentRect.height
+        })
+    }
 })
 
 // TODO: 应该总共只计算一次，而不是每个组件实例都计算一次
@@ -86,36 +95,51 @@ watch($$(refPostRef), () => {
 // 24 = 6rem
 const collapseSize = remToPx(24 / 4.0)
 
-let isPinned = $ref(false)
-let isCollapsed = $ref(false)
-watch($$(isPinned), (isPinned) => { if (!isPinned) { isCollapsed = false } })
-let displayStatus: 'closed' | 'floating' | 'open' | 'collapsed' = $computed(() => {
-    if (isPinned) {
-        return isCollapsed ? 'collapsed' : 'open'
-    }
-    if (shouldFloat) {
-        return 'floating'
-    }
-    return 'closed'
-})
+// FIXME?: 如果拉宽页面使得一个原本折叠的引用视图高度低于折叠高度，该引用视图依旧会处于折叠状态
+let {
+    displayStatus, isPinned, isCollapsed, isCollapsible, eagersToCollapse, onClick
+} = $(function useFix(collapseSize: number, _fullHeight: Ref<number>) {
+    let fullHeight = $(_fullHeight)
 
-let isCollapsible = $computed(() => refPostHeight > collapseSize)
-let eagersToCollapse = $ref(false) // 在有交互前，如果高度允许折叠则折叠
-function onClick(source: 'link' | 'pin') {
-    eagersToCollapse = false
-    if (!isPinned) {
-        isPinned = true
-    } else {
-        if (source === 'link') {
-            if (!isCollapsible) {
-                return
-            }
-            isCollapsed = displayStatus === 'collapsed' ? false : true
+    let isPinned = $ref(false)
+    let isCollapsed = $ref(false)
+    watch($$(isPinned), (isPinned) => { if (!isPinned) { isCollapsed = false } })
+    let displayStatus: 'closed' | 'floating' | 'open' | 'collapsed' = $computed(() => {
+        if (isPinned) {
+            return isCollapsed ? 'collapsed' : 'open'
+        }
+        if (shouldFloat) {
+            return 'floating'
+        }
+        return 'closed'
+    })
+
+    let isCollapsible = $computed(() => fullHeight > collapseSize)
+    let eagersToCollapse = $ref(false) // 在有交互前，如果高度允许折叠则折叠
+    function onClick(source: 'link' | 'pin') {
+        eagersToCollapse = false
+        if (!isPinned) {
+            isPinned = true
         } else {
-            isPinned = false
+            if (source === 'link') {
+                if (!isCollapsible) {
+                    return
+                }
+                isCollapsed = displayStatus === 'collapsed' ? false : true
+            } else {
+                isPinned = false
+            }
         }
     }
-}
+
+    return {
+        displayStatus: $$(displayStatus),
+        isPinned: $$(isPinned), isCollapsed: $$(isCollapsed), isCollapsible: $$(isCollapsible),
+        eagersToCollapse: $$(eagersToCollapse),
+        onClick,
+    }
+}(collapseSize, $$(refPostFullHeight)))
+
 
 watch($$(refPostHeight), () => {
     if (eagersToCollapse && isCollapsible) {
@@ -124,7 +148,8 @@ watch($$(refPostHeight), () => {
     }
 })
 
-// 第一层的引用视图自动固定并折叠
+// 让第一层引用视图自动固定并折叠
+// FIXME: 偶尔有图片的时候折叠会失效？
 onMounted(() => {
     if (props.nestLevel === 1) {
         isPinned = true
