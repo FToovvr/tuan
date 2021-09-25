@@ -12,6 +12,9 @@
     "*.css": "postcss",
   },
   // "editor.formatOnSave": false,
+  "scss.lint.unknownAtRules": "ignore",
+
+  // 自用，但其实没用
   "git.autofetch": false,
   "github.gitAuthentication": false,
 }
