@@ -12,3 +12,9 @@ declare module '*.md' {
   const component: ComponentOptions
   export default component
 }
+
+declare module 'csstype' {
+  interface Properties {
+    'z-index'?: string
+  }
+}
