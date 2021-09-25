@@ -1,26 +1,49 @@
 <script setup lang="ts">
-// import type { Post } from '~/types/post'
 
 import { useStuffStore } from "~/stores/stuff";
 
-// type Props = Post
-// const props = defineProps<Props>()
-interface Props {
-    floorStart: number
-    floorCount: number
+interface PropOffset {
+    type: 'offset'
+    offset: number
+    count: number
 }
-const props = defineProps<Props>()
 
-let { floorStart, floorCount } = $(toRefs(props))
+interface PropPage {
+    type: 'page'
+    page: number
+    pageSize?: number
+}
+
+interface Props {
+    props: PropOffset | PropPage
+}
+const _outerProps = defineProps<Props>()
+
+let computedProps = $computed(() => {
+    const _props = toRef(_outerProps, 'props')
+    let props = $(_props)
+    if (props.type === 'offset') {
+        return {
+            ...props,
+            description: `${props.offset + 1}楼 ~ ${props.offset + props.count}楼`,
+        }
+    } else {
+        return {
+            offset: (props.page - 1) * (props.pageSize ?? 19),
+            count: props.pageSize ?? 19,
+            description: `${props.page}页`,
+        }
+    }
+})
 
 const stuffStore = useStuffStore()
 
-let posts = $computed(() => {
+let posts = computed(() => {
     if (!stuffStore.currentQuest || !stuffStore.currentQuest.posts) {
         return []
     }
     return stuffStore.currentQuest.posts
-        .slice(floorStart - 1, floorStart - 1 + floorCount)
+        .slice(computedProps.offset, computedProps.offset + computedProps.count)
 })
 
 let postListRef = $ref(null)
@@ -33,7 +56,25 @@ onMounted(() => {
 </script>
 
 <template lang="pug">
-.post-list(ref="postListRef")
-    template(v-for="post in posts" :key="post.postId")
-        quest-post(:post="post")
+.post-page
+
+    .post-page-bar
+        .flex
+            .dash
+            div(w:p="x-2")
+                span(w:font="mono") {{ computedProps.description }}
+            .dash
+
+    .post-list(
+        ref="postListRef"
+        w:space="y-1"
+    )
+        template(v-for="post in posts" :key="post.postId")
+            quest-post(:post="post")
 </template>
+
+<style scoped lang="scss">
+.post-page-bar .dash {
+    @apply flex-1 h-0 m-auto border-1 border-dashed border-black;
+}
+</style>

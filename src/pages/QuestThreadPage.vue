@@ -22,7 +22,6 @@ let currentPageNumber = $ref(Number(page))
 watch($$(currentPageNumber), () => {
     history.replaceState({}, '', String(currentPageNumber))
 })
-let offsetStart = $computed(() => (currentPageNumber - 1) * 19)
 
 </script>
 
@@ -43,5 +42,5 @@ div(class="max-w-2xl mx-auto")
         | 
         button(@click="currentPageNumber++") ++
     hr
-    quest-thread-page-content(:floor-start="offsetStart + 1" :floor-count="19")
+    quest-thread-page-content(:props="{ type: 'page', page: currentPageNumber }")
 </template>

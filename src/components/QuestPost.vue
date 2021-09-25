@@ -66,7 +66,6 @@ function onClick(ev: Event) {
 article.quest-post.container.relative(
     v-if="post"
     :id="'id-' + post.postId"
-    w:m="y-1"
     w:border="1 dark:gray"
     :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (props.isCollapsed ? 'max-h-24 overflow-hidden' : '')"
     class="rounded-md"
