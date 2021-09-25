@@ -75,6 +75,6 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .post-page-bar .dash {
-    @apply flex-1 h-0 m-auto border-1 border-dashed border-black;
+    @apply flex-1 h-0 m-auto border-1 border-dashed border-black dark:border-white;
 }
 </style>
