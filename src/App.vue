@@ -23,3 +23,9 @@ initializeStuffStore('/assets/data')
 <template>
   <router-view />
 </template>
+
+<style lang="scss">
+main {
+  touch-action: manipulation;
+}
+</style>
