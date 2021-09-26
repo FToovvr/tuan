@@ -78,9 +78,10 @@ let refPostFullHeight = $ref(0)
 watch($$(refPostRef), () => {
     if (!refPostRef) { return }
 
+    const fullEl = refPostRef.querySelector('.quest-post-wrapper') as HTMLElement | null
     for (const { heightRef, el } of [
         { heightRef: $$(refPostHeight), el: refPostRef },
-        { heightRef: $$(refPostFullHeight), el: refPostRef.querySelector('.quest-post-wrapper')! as unknown as HTMLElement },
+        { heightRef: $$(refPostFullHeight), el: fullEl! },
     ]) {
         heightRef.value = el.clientHeight ?? 0
         useResizeObserver(el, (entries) => {
@@ -187,7 +188,7 @@ keep-alive
                 style="z-index: 2; width: max-content;"
                 :style="{ maxWidth: `calc(${(stuffStore.rootPostWidth ?? 0)}px - ${0.75 + 0.75 /* TODO: 不该 hardcode */ * nestLevel}rem - ${nestLevel * 0.2}rem)` }"
             )
-                quest-post(
+                quest-post-loader(
                     :post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed"
                     @expand="onClick('link')"
                 )

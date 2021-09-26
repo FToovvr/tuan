@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import { useStuffStore } from "~/stores/stuff";
+import QuestPostLoader from "../QuestPost/QuestPostLoader.vue";
 
 interface PropOffset {
     type: 'offset'
@@ -72,7 +73,7 @@ onMounted(() => {
         w:space="y-1"
     )
         template(v-for="post in posts" :key="post.postId")
-            quest-post(:post="post")
+            quest-post-loader(:post="post")
 </template>
 
 <style scoped lang="scss">
