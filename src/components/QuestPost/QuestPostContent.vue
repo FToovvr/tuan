@@ -35,7 +35,8 @@ let content = $computed(() => {
 </script>
 
 <template lang="pug">
-.prose(w:text="left")
+//- TODO: style="hyphens: auto;" or not?
+.prose(w:text="left" w:break="words")
     div(w:whitespace="pre-line" w:leading="snug")
         template(v-if="hasRefLink")
             component(:is="{ template: content, components: { QuestPostRefLink } }")
