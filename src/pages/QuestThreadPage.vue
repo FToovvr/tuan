@@ -29,18 +29,13 @@ watch($$(currentPageNumber), () => {
 div(class="max-w-2xl mx-auto")
     | {{ folder }} > {{ quest }}
     hr
-    div
-        | 页数:
-        |
-        input(
-            type="number" min="1" step="1"
-            w:border="2"
+    div.flex(class="m-auto w-max space-x-2")
+        button(@click="currentPageNumber--") &lt;
+        page-number-input(
             v-model.number="currentPageNumber"
+            :max="((stuffStore.currentQuest?.posts?.length ?? 1 - 1) / 19 | 0) + 1"
         )
-        | 
-        button(@click="currentPageNumber--") --
-        | 
-        button(@click="currentPageNumber++") ++
+        button(@click="currentPageNumber++") &gt;
     hr
     quest-thread-page-viewer(:page-start="currentPageNumber" :page-end="currentPageNumber" :page-current="currentPageNumber")
     div(w:m="b-8")

@@ -14,6 +14,7 @@ declare module 'vue' {
     GlobalHeader: typeof import('./components/layout/GlobalHeader.vue')['default']
     Header: typeof import('./components/layout/Header.vue')['default']
     OverflowMask: typeof import('./components/misc/OverflowMask.vue')['default']
+    PageNumberInput: typeof import('./components/misc/PageNumberInput.vue')['default']
     QuestPost: typeof import('./components/QuestPost/QuestPost.vue')['default']
     QuestPostContent: typeof import('./components/QuestPost/QuestPostContent.vue')['default']
     QuestPostFrame: typeof import('./components/QuestPost/QuestPostFrame.vue')['default']
