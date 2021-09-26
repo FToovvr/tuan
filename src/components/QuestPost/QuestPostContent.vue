@@ -30,7 +30,7 @@ let content = $computed(() => {
         refLink.setAttribute(':nest-level', String(props.nestLevel + 1))
         rawRefLink.parentElement!.replaceChild(refLink, rawRefLink)
     })
-    return dom.documentElement.querySelector('body')!.innerHTML
+    return dom.documentElement.children[1]!
 })
 </script>
 
