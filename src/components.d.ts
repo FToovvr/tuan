@@ -5,11 +5,14 @@
 declare module 'vue' {
   export interface GlobalComponents {
     CarbonCampsite: typeof import('~icons/carbon/campsite')['default']
+    CarbonCaretLeft: typeof import('~icons/carbon/caret-left')['default']
+    CarbonCaretRight: typeof import('~icons/carbon/caret-right')['default']
     CarbonDicomOverlay: typeof import('~icons/carbon/dicom-overlay')['default']
     CarbonLanguage: typeof import('~icons/carbon/language')['default']
     CarbonLogoGithub: typeof import('~icons/carbon/logo-github')['default']
     CarbonMoon: typeof import('~icons/carbon/moon')['default']
     CarbonSun: typeof import('~icons/carbon/sun')['default']
+    FixedWrapper: typeof import('./components/misc/FixedWrapper.vue')['default']
     Footer: typeof import('./components/layout/Footer.vue')['default']
     GlobalHeader: typeof import('./components/layout/GlobalHeader.vue')['default']
     Header: typeof import('./components/layout/Header.vue')['default']
@@ -22,6 +25,7 @@ declare module 'vue' {
     QuestPostLoader: typeof import('./components/QuestPost/QuestPostLoader.vue')['default']
     QuestPostRefLink: typeof import('./components/QuestPost/QuestPostRefLink.vue')['default']
     QuestThreadPageContent: typeof import('./components/QuestThread/QuestThreadPageContent.vue')['default']
+    QuestThreadPageControl: typeof import('./components/QuestThread/QuestThreadPageControl.vue')['default']
     QuestThreadPageViewer: typeof import('./components/QuestThread/QuestThreadPageViewer.vue')['default']
     README: typeof import('./components/README.md')['default']
   }
