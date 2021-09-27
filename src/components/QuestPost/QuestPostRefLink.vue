@@ -23,6 +23,16 @@ let refPostRef: HTMLDivElement | null = $ref(null)
 
 let stuffStore = useStuffStore()
 
+let maxWidth = $computed(() => {
+    const indentSpace = '0.75rem' // TODO: 不该 hardcode
+    const rootWidth = `${stuffStore.rootPostWidth!}px`
+
+    const leftSpace = `(${indentSpace} * ${props.nestLevel + 1})`
+    const rightSpace = `(0.2em * ${props.nestLevel})`
+
+    return `calc(${rootWidth} - ${leftSpace} - ${rightSpace})`
+})
+
 // 悬浮的引用视图
 let {
     onHovers, shouldFloat,
@@ -189,7 +199,7 @@ keep-alive
                 ref="refPostRef"
                 @mouseenter="onHovers.refPost = true, eagersToCollapse = false" @mouseleave="onHovers.refPost = false"
                 style="width: max-content;"
-                :style="{ zIndex: refPostZIndex, maxWidth: `calc(${(stuffStore.rootPostWidth ?? 0)}px - ${0.75 + 0.75 /* TODO: 不该 hardcode */ * nestLevel}rem - ${nestLevel * 0.2}rem)` }"
+                :style="{ zIndex: refPostZIndex, maxWidth: maxWidth }"
             )
                 quest-post-loader(
                     :post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed"
