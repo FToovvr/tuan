@@ -26,7 +26,7 @@ watch($$(currentPageNumber), () => {
 
 })
 
-let maxPageNumber = $computed(() => ((stuffStore.currentQuest?.posts?.length ?? 1 - 1) / 19 | 0) + 1)
+let maxPageNumber = $computed(() => (((stuffStore.currentQuest?.posts?.length ?? 1) - 1) / 19 | 0) + 1)
 
 </script>
 
