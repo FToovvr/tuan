@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import zIndexes from '~/logic/zIndexes'
+
 interface Props {
     isRefPost: boolean
     isCollapsed: boolean
@@ -14,6 +16,9 @@ function onClick(ev: Event) {
         ev.stopPropagation()
     }
 }
+
+const headZIndex = zIndexes.postHead
+
 </script>
 
 <template lang="pug">
@@ -32,12 +37,11 @@ article.quest-post.container.relative(
         )
 
         //- 头部
-        div(w:text="sm" class="sticky top-0" style="z-index: 1;")
-            .quest-post-head(w:p="t-1")
-                slot(name="head")
-                div(w:clear="both")
-                div(class="h-1")
-                hr(w:m="x-0.5" w:border="dashed gray-400")
+        .quest-post-head(w:text="sm" class="sticky top-0" w:p="t-1")
+            slot(name="head")
+            div(w:clear="both")
+            div(class="h-1")
+            hr(w:m="x-0.5" w:border="dashed gray-400")
 
         div(:class="isRefPost ? 'h-1' : 'h-3'")
 
@@ -53,5 +57,9 @@ article.quest-post.container.relative(
 .quest-post,
 .quest-post-head {
     background-color: v-bind(backgroundColorRgbHex);
+}
+
+.quest-post-head {
+    z-index: v-bind(headZIndex);
 }
 </style>

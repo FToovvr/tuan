@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+import zIndexes from '~/logic/zIndexes'
+
 interface Props {
     backgroundColorRgbHex: string
     height?: string
@@ -11,6 +13,8 @@ let height = $computed(() => props.height ?? '2rem')
 
 let bg = $(toRef(props, 'backgroundColorRgbHex'))
 let bgTransparent = $computed(() => `${bg}00`)
+
+const overflowMaskZIndex = zIndexes.overflowMask
 
 </script>
 
@@ -28,6 +32,6 @@ div::before {
     height: v-bind(height);
     width: 100%;
     background: linear-gradient(v-bind(bgTransparent), v-bind(bg));
-    z-index: 3;
+    z-index: v-bind(overflowMaskZIndex);
 }
 </style>

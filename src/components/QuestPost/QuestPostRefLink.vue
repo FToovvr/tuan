@@ -4,6 +4,7 @@ import type { Ref } from "vue"
 import { useStuffStore } from "~/stores/stuff"
 import { postBackgroundColor } from "~/logic/backgroundColor"
 import { remToPx } from "~/logic/units"
+import zIndexes from "~/logic/zIndexes"
 
 interface Props {
     postId: number
@@ -164,6 +165,7 @@ onMounted(() => {
     }
 })
 
+const refPostZIndex = zIndexes.refPost
 
 </script>
 
@@ -182,11 +184,12 @@ keep-alive
     )   
         //- 为了不感染上 `.prose`
         teleport(:to="refRelativeDiv")
+            //- 由于处于 teleport 内，目前 CSS 中的 v-bind 无效， z-index 在这里嵌入
             .absolute(
                 ref="refPostRef"
                 @mouseenter="onHovers.refPost = true, eagersToCollapse = false" @mouseleave="onHovers.refPost = false"
-                style="z-index: 2; width: max-content;"
-                :style="{ maxWidth: `calc(${(stuffStore.rootPostWidth ?? 0)}px - ${0.75 + 0.75 /* TODO: 不该 hardcode */ * nestLevel}rem - ${nestLevel * 0.2}rem)` }"
+                style="width: max-content;"
+                :style="{ zIndex: refPostZIndex, maxWidth: `calc(${(stuffStore.rootPostWidth ?? 0)}px - ${0.75 + 0.75 /* TODO: 不该 hardcode */ * nestLevel}rem - ${nestLevel * 0.2}rem)` }"
             )
                 quest-post-loader(
                     :post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed"
