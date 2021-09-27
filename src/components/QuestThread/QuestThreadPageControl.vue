@@ -20,6 +20,7 @@ function changePage(newValue: number) {
 div.flex(w:m="auto" w:w="max" w:space="x-0" w:items="center")
     button(
         @click="changePage(modelValue - 1)"
+        :disabled="modelValue === 1"
         w:h="1.2em" w:text="3xl"
     )
         carbon-caret-left
@@ -30,7 +31,14 @@ div.flex(w:m="auto" w:w="max" w:space="x-0" w:items="center")
     )
     button(
         @click="changePage(modelValue + 1)"
+        :disabled="modelValue === max"
         w:h="1.2em" w:text="3xl"
     )
         carbon-caret-right
 </template>
+
+<style scoped lang="scss">
+button[disabled] {
+    @apply text-gray-300 dark:text-gray-700;
+}
+</style>
