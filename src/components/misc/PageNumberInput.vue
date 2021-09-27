@@ -38,10 +38,19 @@ onMounted(() => {
     }
 })
 
+function focusOnInput(ev: Event) {
+    if (!(ev.target instanceof HTMLInputElement)) {
+        inputRef?.focus()
+    }
+}
+
 </script>
 
 <template lang="pug">
-div.flex(w:justify="center")
+div.flex(
+    w:justify="center"
+    @click="focusOnInput"
+)
     input.block(
         ref="inputRef"
         type="number" inputmode="decimal"
