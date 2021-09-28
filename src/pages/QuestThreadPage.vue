@@ -11,7 +11,7 @@ interface Params {
     page: string
 }
 const params = route.params as unknown as Params
-let { folder, quest, page } = $(toRefs(params))
+let { folder, quest, page } = $(reactive({ ...params }))
 
 const stuffStore = useStuffStore()
 
