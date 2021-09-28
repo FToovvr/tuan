@@ -62,6 +62,7 @@ quest-post-frame(
                 quest-post-image(:image-url="post.imageUrl" :background-color-rgb-hex="postBackgroundColor")
             //- 正文
             quest-post-content(:content="post.content" :nest-level="nestLevel ?? 0")
+            .clear-both
 
 </template>
 
