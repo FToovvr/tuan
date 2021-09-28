@@ -1,21 +1,22 @@
 <script setup lang="ts">
 
 interface Props {
-    max: number
     modelValue: number
+    max: number | null
 }
 const props = defineProps<Props>()
 let currentValue = $(toRef(props, 'modelValue'))
 
 const emit = defineEmits(['update:modelValue'])
 
-let width = $computed(() => `${props.max.toString().length + 1}ch`)
+let width = $computed(() => `${Math.max(props.max ?? 0, props.modelValue).toString().length + 1}ch`)
 
+function changePage(newValue: string | number, recoverCaret = false) {
+    const caretStart = recoverCaret ? inputRef?.selectionStart : null
 
-function changePage(newValue: string | number) {
     let numValueNum = Number(newValue)
     if (!Number.isInteger(numValueNum)
-        || (numValueNum <= 0 || numValueNum > props.max)) {
+        || (numValueNum <= 0 || numValueNum > (props.max ?? 0))) {
         if (newValue === '') { // 方便完全删除
             return true
         }
@@ -23,6 +24,11 @@ function changePage(newValue: string | number) {
     }
 
     emit('update:modelValue', newValue)
+
+    if (caretStart) {
+        nextTick(() => inputRef?.setSelectionRange(caretStart!, caretStart!))
+    }
+
     return true
 }
 
@@ -53,11 +59,12 @@ div.flex(
 )
     input.block(
         ref="inputRef"
-        type="number" inputmode="decimal"
+        inputmode="decimal"
         :value="currentValue"
+        @keydown.up.prevent="changePage(currentValue - 1, true)" @keydown.down.prevent="changePage(currentValue + 1, true)"
     )
     div /
-    div.max {{ max }}
+    div.max {{ max ?? '…' }}
 </template>
 
 <style scoped lang="scss">
@@ -66,6 +73,9 @@ div.flex {
     @apply font-mono text-black;
     margin: auto;
     width: calc(v-bind(width) * 2 + 2ch);
+
+    user-select: none;
+    cursor: text;
 }
 
 input {
@@ -75,15 +85,6 @@ input {
 
     @apply h-6 bg-transparent;
     @apply text-center text-black;
-
-    // https://stackoverflow.com/a/22559163
-    &[type="number"] {
-        -moz-appearance: textfield;
-    }
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-    }
 }
 
 .max {

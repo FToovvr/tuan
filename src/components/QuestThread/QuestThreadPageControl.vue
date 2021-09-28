@@ -2,14 +2,14 @@
 
 interface Props {
     modelValue: number
-    max: number
+    max: number | null
 }
 const props = defineProps<Props>()
 
 const emit = defineEmits(['update:modelValue'])
 
 function changePage(newValue: number) {
-    if (newValue > 0 && newValue <= props.max) {
+    if (newValue > 0 && newValue <= (props.max ?? 0)) {
         emit('update:modelValue', newValue)
     }
 }
@@ -17,13 +17,13 @@ function changePage(newValue: number) {
 </script>
 
 <template lang="pug">
-div.flex(w:m="auto" w:w="max" w:space="x-0" w:items="center")
+div.flex(w:m="auto" w:w="max" w:space="x-1" w:p="0.5" w:items="center")
     button(
         @click="changePage(modelValue - 1)"
         :disabled="modelValue === 1"
-        w:h="1.2em" w:text="3xl"
+        w:h="1.2em" w:text="2xl"
     )
-        carbon-caret-left
+        ion-caret-up
     page-number-input(
         :modelValue="modelValue"
         :max="max"
@@ -32,9 +32,9 @@ div.flex(w:m="auto" w:w="max" w:space="x-0" w:items="center")
     button(
         @click="changePage(modelValue + 1)"
         :disabled="modelValue === max"
-        w:h="1.2em" w:text="3xl"
+        w:h="1.2em" w:text="2xl"
     )
-        carbon-caret-right
+        ion-caret-down
 </template>
 
 <style scoped lang="scss">

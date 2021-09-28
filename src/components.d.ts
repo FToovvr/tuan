@@ -16,6 +16,8 @@ declare module 'vue' {
     Footer: typeof import('./components/layout/Footer.vue')['default']
     GlobalHeader: typeof import('./components/layout/GlobalHeader.vue')['default']
     Header: typeof import('./components/layout/Header.vue')['default']
+    IonCaretDown: typeof import('~icons/ion/caret-down')['default']
+    IonCaretUp: typeof import('~icons/ion/caret-up')['default']
     OverflowMask: typeof import('./components/misc/OverflowMask.vue')['default']
     PageNumberInput: typeof import('./components/misc/PageNumberInput.vue')['default']
     QuestPost: typeof import('./components/QuestPost/QuestPost.vue')['default']
