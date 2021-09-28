@@ -12,9 +12,6 @@ export const useStuffStore = defineStore('stuff', {
 
     // 最外层帖的宽度
     rootPostWidth: 0,
-
-    // QuestPostRefLink inject 获得不到值的 workaround
-    nextRefRelativeDivId: 1,
   }),
   actions: {
 

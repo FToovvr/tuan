@@ -1,9 +1,9 @@
 <script setup lang="ts">
 
 import type { Post } from "~/types/post"
-import { useStuffStore } from "~/stores/stuff"
-import { postBackgroundColor } from "~/logic/backgroundColor"
 import QuestPostFrame from "./QuestPostFrame.vue"
+import { postBackgroundColor } from "~/logic/backgroundColor"
+import { postContentDivKey } from "~/logic/injectKeys"
 
 interface Props {
     post: Post // 帖内容或帖号
@@ -16,19 +16,8 @@ let isRefPost = $computed(() => (props.nestLevel) > 0)
 
 const emit = defineEmits(['expand'])
 
-const stuffStore = useStuffStore()
-
 let postContentDiv: HTMLDivElement | null = $ref(null)
-let refRelativeDivId: number | null = $ref(null)
-onMounted(() => {
-    // provide('ref-relative-div', $$(postContentDiv))
-    refRelativeDivId = stuffStore.nextRefRelativeDivId
-    stuffStore.nextRefRelativeDivId++
-    if (postContentDiv) {
-        postContentDiv.id = `ref-relative-div-${refRelativeDivId}`
-    }
-})
-
+provide(postContentDivKey, $$(postContentDiv))
 
 let post = $(toRef(props, 'post'))
 
@@ -77,7 +66,7 @@ quest-post-frame(
             div(v-if="post.imageUrl")
                 quest-post-image(:image-url="post.imageUrl" :background-color-rgb-hex="postBackgroundColor")
             //- 正文
-            quest-post-content(:content="post.content" :ref-relative-div-id="refRelativeDivId", :nest-level="nestLevel ?? 0")
+            quest-post-content(:content="post.content" :nest-level="nestLevel ?? 0")
 
 </template>
 

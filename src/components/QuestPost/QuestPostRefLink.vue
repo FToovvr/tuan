@@ -5,18 +5,17 @@ import { useStuffStore } from "~/stores/stuff"
 import { postBackgroundColor } from "~/logic/backgroundColor"
 import { remToPx } from "~/logic/units"
 import zIndexes from "~/logic/zIndexes"
+import { postContentDivKey } from "~/logic/injectKeys"
 
 interface Props {
     postId: number
 
     nestLevel: number
-    refRelativeDivId: number | null
 }
 const props = defineProps<Props>()
 let postId = $(toRef(props, 'postId'))
-let refRelativeDivId = $(toRef(props, 'refRelativeDivId'))
 
-let refRelativeDiv = document.getElementById(`ref-relative-div-${refRelativeDivId}`)
+let refRelativeDiv = $(inject(postContentDivKey))
 
 let refPostAnchorRef: HTMLDivElement | null = $ref(null)
 let refPostRef: HTMLDivElement | null = $ref(null)
@@ -72,6 +71,7 @@ let {
             return
         }
         const { top: elemTop, left: elemLeft } = refPostAnchorRef.getBoundingClientRect()
+        // @ts-ignore Property 'getBoundingClientRect' does not exist on type 'DestructureRefs<Ref<HTMLDivElement | null>>'
         const { top: bodyTop, left: bodyLeft } = refRelativeDiv.getBoundingClientRect()
         refPostRef.style.top = `${elemTop - bodyTop}px`
         refPostRef.style.left = `${elemLeft - bodyLeft}px`
