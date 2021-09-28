@@ -1,16 +1,20 @@
 
 export default {
+
+    // 负数 zIndex，如 `-n` 与第 n 页对应
+
     initial: 0,
 
     // 帖的头部
-    postHead: 10000,
+    postHead: 1_000_000,
 
-    // 引用视图，否则超出其父视图外部的部分内容会被裁剪掉
-    refPost: 20000,
+    // 帖。
+    // 如果引用视图没有，超出其父视图外部的部分内容会被裁剪掉？
+    post: 2_000_000,
 
     // 折叠时的遮盖
-    overflowMask: 30000,
+    overflowMask: 3_000_000,
 
     // fixed
-    fixedWrapper: 40000,
+    fixedWrapper: 4_000_000,
 }

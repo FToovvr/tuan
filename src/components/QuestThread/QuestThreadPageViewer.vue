@@ -21,6 +21,9 @@ let pageNumbers = $computed(() => function* () {
 
 div(v-for="page in pageNumbers()" :key="page")
     div(w:h="2")
-    quest-thread-page-content(:props="{ type: 'page', page: page }")
+    quest-thread-page-content(
+        :props="{ type: 'page', page: page }"
+        :style="{ zIndex: -page }"
+    )
 
 </template>

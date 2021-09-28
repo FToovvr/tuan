@@ -41,6 +41,7 @@ template(v-if="post")
     quest-post(
         :post="post" :nest-level="nestLevel ?? 0" :is-collapsed="isCollapsed ?? false"
         @expand="emit('expand')"
+        v-bind="$attrs"
     )
         template(#head-left)
             slot(name="head-left")
@@ -48,6 +49,7 @@ template(v-else)
     quest-post-frame(
         :is-ref-post="isRefPost" :is-collapsed="isCollapsed ?? false" :background-color-rgb-hex="postBackgroundColor"
         @expand="emit('expand')"
+        v-bind="$attrs"
     )
         template(#head)
             div(w:float="left")

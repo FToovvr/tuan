@@ -13,7 +13,7 @@ interface Props {
     // 处于第几层嵌套，最外层的帖为 0
     nestLevel: number
     // 属于同一层的第几个引用链接
-    order: number
+    siblingOrder: number
 }
 const props = defineProps<Props>()
 let postId = $(toRef(props, 'postId'))
@@ -183,7 +183,7 @@ onMounted(() => {
 
 let siblingRefLinkCount = $(inject(siblingRefLinkCountKey))
 // @ts-ignore The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-const refPostZIndex = zIndexes.refPost + (siblingRefLinkCount - props.order)
+const refPostZIndex = zIndexes.post + (siblingRefLinkCount - props.siblingOrder)
 
 </script>
 

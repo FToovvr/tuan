@@ -31,7 +31,7 @@ let content = $computed(() => {
         refLink.setAttribute(':post-id', String(refPostId))
         // nest-level 从 QuestPostRefLink 起加深
         refLink.setAttribute(':nest-level', String(props.nestLevel + 1))
-        refLink.setAttribute(':order', String(nextOrder))
+        refLink.setAttribute(':sibling-order', String(nextOrder))
         nextOrder++
         rawRefLink.parentElement!.replaceChild(refLink, rawRefLink)
     })

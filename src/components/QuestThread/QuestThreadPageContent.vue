@@ -1,7 +1,9 @@
 <script setup lang="ts">
 
-import { useStuffStore } from "~/stores/stuff";
 import QuestPostLoader from "../QuestPost/QuestPostLoader.vue";
+
+import { useStuffStore } from "~/stores/stuff";
+import zIndexes from "~/logic/zIndexes"
 
 interface PropOffset {
     type: 'offset'
@@ -72,8 +74,11 @@ onMounted(() => {
         ref="postListRef"
         w:space="y-1"
     )
-        template(v-for="post in posts" :key="post.postId")
-            quest-post-loader(:post="post")
+        template(v-for="post, i in posts" :key="post.postId")
+            quest-post-loader(
+                :post="post"
+                :style="{ zIndex: zIndexes.post + posts.length - i }"
+            )
 </template>
 
 <style scoped lang="scss">
