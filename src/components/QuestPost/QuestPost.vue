@@ -3,7 +3,6 @@
 import type { Post } from "~/types/post"
 import QuestPostFrame from "./QuestPostFrame.vue"
 import { postBackgroundColor } from "~/logic/backgroundColor"
-import { postContentDivKey } from "~/logic/injectKeys"
 
 interface Props {
     post: Post // 帖内容或帖号
@@ -15,9 +14,6 @@ const props = defineProps<Props>()
 let isRefPost = $computed(() => (props.nestLevel) > 0)
 
 const emit = defineEmits(['expand'])
-
-let postContentDiv: HTMLDivElement | null = $ref(null)
-provide(postContentDivKey, readonly($$(postContentDiv)))
 
 let post = $(toRef(props, 'post'))
 
@@ -59,9 +55,8 @@ quest-post-frame(
 
         //- TODO: 标题和名称
 
-
     template(#content)
-        div(ref="postContentDiv")
+        div
             //- 附图（右侧）
             div(v-if="post.imageUrl")
                 quest-post-image(:image-url="post.imageUrl" :background-color-rgb-hex="postBackgroundColor")

@@ -5,6 +5,8 @@ import zIndexes from '~/logic/zIndexes'
 interface Props {
     backgroundColorRgbHex: string
     height?: string
+
+    zIndex?: number | boolean
 }
 
 const props = defineProps<Props>()
@@ -14,7 +16,7 @@ let height = $computed(() => props.height ?? '2rem')
 let bg = $(toRef(props, 'backgroundColorRgbHex'))
 let bgTransparent = $computed(() => `${bg}00`)
 
-const overflowMaskZIndex = zIndexes.overflowMask
+const overflowMaskZIndex = (typeof props.zIndex === 'number') ? props.zIndex : (props.zIndex ? zIndexes.overflowMask : null)
 
 </script>
 

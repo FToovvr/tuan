@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import zIndexes from '~/logic/zIndexes'
+import { postContentDivKey } from "~/logic/injectKeys"
 
 interface Props {
     isRefPost: boolean
@@ -10,10 +11,19 @@ const props = defineProps<Props>()
 
 const emit = defineEmits(['expand'])
 
-function onClick(ev: Event) {
+let postContentDivRef: HTMLDivElement | null = $ref(null)
+provide(postContentDivKey, readonly($$(postContentDivRef)))
+
+function tryExpanding(ev: Event) {
+    // TODO: 点击内部固定的引用视图，如果对应内部视图没有触发操作，则展开外部视图自身
     if (props.isCollapsed) {
         emit('expand')
-        ev.stopPropagation()
+        if (ev.target instanceof HTMLElement && ev.target.classList.contains('ref-post-link')) {
+            // 不 stopPropagation
+            // TODO: 考虑其他适用情况？比如链接，甚至任意交互行为？
+        } else {
+            ev.stopPropagation()
+        }
     }
 }
 
@@ -24,17 +34,11 @@ const headZIndex = zIndexes.postHead
 <template lang="pug">
 article.quest-post.container.relative(
     w:border="1 dark:gray"
-    :class="(isRefPost ? '!border-gray-400 pb-2 px-3' : 'pt-2 pb-3 px-6') + ' ' + (isCollapsed ? 'max-h-24 overflow-hidden' : '')"
+    :class="isRefPost ? '!border-gray-400 px-3' : 'pt-2 px-6'"
     class="rounded-md"
 )
 
     .quest-post-wrapper
-
-        overflow-mask(
-            v-if="isCollapsed"
-            @click.capture="onClick"
-            :background-color-rgb-hex="backgroundColorRgbHex"
-        )
 
         //- 头部
         .quest-post-head(w:text="sm" class="sticky top-0" w:p="t-1")
@@ -46,8 +50,19 @@ article.quest-post.container.relative(
         div(:class="isRefPost ? 'h-1' : 'h-3'")
 
         //- 正文（+附图）
-        .relative(@click.capture="onClick")
-            slot(name="content")
+        .relative(ref="postContentDivRef")
+            overflow-mask(
+                v-if="isCollapsed"
+                @click.capture="tryExpanding"
+                :background-color-rgb-hex="backgroundColorRgbHex"
+                z-index
+            )
+            div(:class="isCollapsed ? 'max-h-15 overflow-hidden' : undefined")
+                .quest-post-content-wrapper
+                    .relative.quest-post-ref-wrapper
+                    div(@click.capture="tryExpanding")
+                        slot(name="content")
+                        div(:class="isRefPost ? 'h-2' : 'h-3'")
 
         div(w:clear="both")
 

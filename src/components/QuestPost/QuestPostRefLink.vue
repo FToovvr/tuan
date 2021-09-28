@@ -93,7 +93,7 @@ let refPostFullHeight = $ref(0)
 watch($$(refPostRef), () => {
     if (!refPostRef) { return }
 
-    const fullEl = refPostRef.querySelector('.quest-post-wrapper') as HTMLElement | null
+    const fullEl = refPostRef.querySelector('.quest-post-content-wrapper') as HTMLElement | null
     for (const { heightRef, widthRef, el } of [
         { heightRef: $$(refPostHeight), widthRef: $$(refPostWidth), el: refPostRef },
         { heightRef: $$(refPostFullHeight), widthRef: null, el: fullEl! },
@@ -111,7 +111,7 @@ watch($$(refPostRef), () => {
 // TODO: 高度的值应该固定在某处，而不是同时硬编码在这里和 QuestPost.vue 中 `article.container` 的 `:class` 绑定中
 // https://stackoverflow.com/a/42769683
 // 24 = 6rem
-const collapseSize = remToPx(24 / 4.0)
+const collapseSize = remToPx(15 / 4.0)
 
 // FIXME?: 如果拉宽页面使得一个原本折叠的引用视图高度低于折叠高度，该引用视图依旧会处于折叠状态
 let {
@@ -159,6 +159,8 @@ let {
     }
 }(collapseSize, $$(refPostFullHeight)))
 
+// @ts-ignore Property 'querySelector' does not exist on type 'DestructureRefs<Ref<HTMLDivElement | null>>'
+let teleportToEl = $computed(() => isPinned ? refRelativeDiv?.querySelector('.relative.quest-post-ref-wrapper') : refRelativeDiv)
 
 watch($$(refPostFullHeight), () => {
     if (eagersToCollapse && isCollapsible) {
@@ -183,12 +185,12 @@ onMounted(() => {
 
 let siblingRefLinkCount = $(inject(siblingRefLinkCountKey))
 // @ts-ignore The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-const refPostZIndex = zIndexes.post + (siblingRefLinkCount - props.siblingOrder)
+let refPostZIndex = $computed(() => (displayStatus === 'floating') ? zIndexes.floatingPost : (zIndexes.post + (siblingRefLinkCount - props.siblingOrder)))
 
 </script>
 
 <template lang="pug">
-span(
+span.ref-post-link(
     style="color: #789922"
     :style="{ cursor: (displayStatus === 'open') ? (isCollapsible ? 'zoom-out' : '') : 'zoom-in' }"
     w:font="mono" w:text="sm"
@@ -201,7 +203,7 @@ keep-alive
         :style="isPinned ? { height: `${refPostHeight}px`, width: `${refPostWidth}px` } : undefined"
     )   
         //- 为了不感染上 `.prose`
-        teleport(:to="refRelativeDiv")
+        teleport(:to="teleportToEl")
             //- 由于处于 teleport 内，目前 CSS 中的 v-bind 无效， z-index 在这里嵌入
             .absolute(
                 ref="refPostRef"
@@ -219,6 +221,7 @@ keep-alive
                                 v-if="isCollapsed"
                                 @click="onClick('pin')" w:cursor="pointer"
                                 height="1em" :background-color-rgb-hex="postBackgroundColor"
+                                z-index
                             )
                             span.pin-button(
                                 :data-status="displayStatus"
