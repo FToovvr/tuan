@@ -17,7 +17,7 @@ let isRefPost = $computed(() => (props.nestLevel) > 0)
 const emit = defineEmits(['expand'])
 
 let postContentDiv: HTMLDivElement | null = $ref(null)
-provide(postContentDivKey, $$(postContentDiv))
+provide(postContentDivKey, readonly($$(postContentDiv)))
 
 let post = $(toRef(props, 'post'))
 
