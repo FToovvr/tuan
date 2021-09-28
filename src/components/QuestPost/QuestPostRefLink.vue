@@ -84,19 +84,22 @@ let {
 
 // 帖当前的高度（不包含由于折叠被隐藏的高度）
 let refPostHeight = $ref(0)
+let refPostWidth = $ref(0)
 // 帖整体的高度（包含由于折叠被隐藏的高度）
 let refPostFullHeight = $ref(0)
 watch($$(refPostRef), () => {
     if (!refPostRef) { return }
 
     const fullEl = refPostRef.querySelector('.quest-post-wrapper') as HTMLElement | null
-    for (const { heightRef, el } of [
-        { heightRef: $$(refPostHeight), el: refPostRef },
-        { heightRef: $$(refPostFullHeight), el: fullEl! },
+    for (const { heightRef, widthRef, el } of [
+        { heightRef: $$(refPostHeight), widthRef: $$(refPostWidth), el: refPostRef },
+        { heightRef: $$(refPostFullHeight), widthRef: null, el: fullEl! },
     ]) {
         heightRef.value = el.clientHeight ?? 0
+        if (widthRef) { widthRef.value = el.clientWidth ?? 0 }
         useResizeObserver(el, (entries) => {
             heightRef.value = entries[0].contentRect.height
+            if (widthRef) { widthRef.value = entries[0].contentRect.width }
         })
     }
 })
@@ -190,7 +193,7 @@ keep-alive
     .ref-post-anchor(
         v-if="refRelativeDiv && (shouldFloat || isPinned)"
         ref="refPostAnchorRef"
-        :style="{ height: isPinned ? `${refPostHeight}px` : 0 }"
+        :style="isPinned ? { height: `${refPostHeight}px`, width: `${refPostWidth}px` } : undefined"
     )   
         //- 为了不感染上 `.prose`
         teleport(:to="refRelativeDiv")
