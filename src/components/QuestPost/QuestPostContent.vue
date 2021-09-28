@@ -1,5 +1,7 @@
 <script setup lang="ts">
+
 import QuestPostRefLink from './QuestPostRefLink.vue'
+import { siblingRefLinkCountKey } from '~/logic/injectKeys'
 
 import DOMPurify from 'dompurify'
 
@@ -14,9 +16,12 @@ const props = defineProps<Props>()
 let _dirtyContent = $(toRef(props, 'content'))
 let cleanedContent = $computed(() => DOMPurify.sanitize(_dirtyContent))
 let hasRefLink = $computed(() => cleanedContent.indexOf('<font') >= 0)
+let siblingRefLinkCount = $ref(0)
+provide(siblingRefLinkCountKey, readonly($$(siblingRefLinkCount)))
 let content = $computed(() => {
     const dom = (new DOMParser()).parseFromString(`<div>${cleanedContent}</div>`, 'text/html')
     const rawRefLinks = dom.querySelectorAll('font[color="#789922"]')
+    let nextOrder = 1
     rawRefLinks.forEach((rawRefLink) => {
         if (!/>>No\.\d+/.test(rawRefLink.textContent!)) {
             return
@@ -26,8 +31,11 @@ let content = $computed(() => {
         refLink.setAttribute(':post-id', String(refPostId))
         // nest-level 从 QuestPostRefLink 起加深
         refLink.setAttribute(':nest-level', String(props.nestLevel + 1))
+        refLink.setAttribute(':order', String(nextOrder))
+        nextOrder++
         rawRefLink.parentElement!.replaceChild(refLink, rawRefLink)
     })
+    siblingRefLinkCount = nextOrder - 1
     return dom.documentElement.children[1]!
 })
 </script>

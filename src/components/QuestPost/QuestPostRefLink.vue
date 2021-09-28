@@ -5,12 +5,15 @@ import { useStuffStore } from "~/stores/stuff"
 import { postBackgroundColor } from "~/logic/backgroundColor"
 import { remToPx } from "~/logic/units"
 import zIndexes from "~/logic/zIndexes"
-import { postContentDivKey } from "~/logic/injectKeys"
+import { postContentDivKey, siblingRefLinkCountKey } from "~/logic/injectKeys"
 
 interface Props {
     postId: number
 
+    // 处于第几层嵌套，最外层的帖为 0
     nestLevel: number
+    // 属于同一层的第几个引用链接
+    order: number
 }
 const props = defineProps<Props>()
 let postId = $(toRef(props, 'postId'))
@@ -178,7 +181,9 @@ onMounted(() => {
     }
 })
 
-const refPostZIndex = zIndexes.refPost
+let siblingRefLinkCount = $(inject(siblingRefLinkCountKey))
+// @ts-ignore The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+const refPostZIndex = zIndexes.refPost + (siblingRefLinkCount - props.order)
 
 </script>
 
