@@ -31,7 +31,7 @@ let createdAt = $computed(() => {
 quest-post-frame(
     v-if="post"
     :id="isRefPost ? undefined : 'id-' + post.postId"
-    :is-ref-post="isRefPost" :is-collapsed="isCollapsed" :background-color-rgb-hex="postBackgroundColor"
+    :nest-level="nestLevel" :is-collapsed="isCollapsed" :background-color-rgb-hex="postBackgroundColor"
     @expand="emit('expand')"
 )
 

@@ -5,11 +5,12 @@ import zIndexes from '~/logic/zIndexes'
 import { postContentDivKey } from "~/logic/injectKeys"
 
 interface Props {
-    isRefPost: boolean
+    nestLevel: number
     isCollapsed: boolean
     backgroundColorRgbHex: string
 }
 const props = defineProps<Props>()
+let isRefPost = computed(() => props.nestLevel > 0)
 
 const emit = defineEmits(['expand'])
 

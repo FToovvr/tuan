@@ -13,7 +13,6 @@ interface Props {
     isCollapsed?: boolean
 }
 const props = defineProps<Props>()
-let isRefPost = $computed(() => (props.nestLevel ?? 0) > 0)
 
 const emit = defineEmits(['expand'])
 
@@ -47,7 +46,7 @@ template(v-if="post")
             slot(name="head-left")
 template(v-else)
     quest-post-frame(
-        :is-ref-post="isRefPost" :is-collapsed="isCollapsed ?? false" :background-color-rgb-hex="postBackgroundColor"
+        :nest-level="nestLevel ?? 0" :is-collapsed="isCollapsed ?? false" :background-color-rgb-hex="postBackgroundColor"
         @expand="emit('expand')"
         v-bind="$attrs"
     )
