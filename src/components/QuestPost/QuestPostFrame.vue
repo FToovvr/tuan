@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Ref } from 'vue'
+
 import zIndexes from '~/logic/zIndexes'
 import { postContentDivKey } from "~/logic/injectKeys"
 
@@ -27,7 +29,50 @@ function tryExpanding(ev: Event) {
     }
 }
 
-const headZIndex = zIndexes.postHead
+let top = $(inject('offsetTop', ref(0)))
+let height = $ref(0)
+let bottom = $computed(() => top + height)
+provide('offsetTop', readonly($$(bottom)))
+
+// 不知为何，除了根部的帖和自动打开的引用视图外，
+// 新创立的引用视图的 headRef 会引用到一处无内部内容的元素
+let headRef: HTMLElement | null = $ref(null);
+let isSticking = $ref(false)
+onMounted(() => {
+    height = headRef!.getBoundingClientRect().height
+
+    // 需要放在 onMounted 里就才能运作…
+    watch((function useIsSticking(_headRef: Ref<HTMLElement | null>) {
+        let headRef = $(_headRef)
+
+        let listener: EventListener | null = $ref(null)
+
+        let isSticking = $ref(false)
+
+        useIntersectionObserver(headRef, ([{ isIntersecting }]) => {
+            if (isIntersecting) {
+                listener = (ev: Event) => {
+                    if (!headRef) {
+                        // 翻页导致帖被卸下了
+                        // TODO: 这么做有些偷懒，不知有无更优雅的方式
+                        window.removeEventListener('scroll', listener!)
+                        return
+                    }
+                    isSticking = headRef!.offsetTop > top
+                }
+                window.addEventListener('scroll', listener)
+            } else {
+                if (listener) {
+                    window.removeEventListener('scroll', listener)
+                }
+            }
+        })
+
+        return $$(isSticking)
+    })($$(headRef)), (newValue) => isSticking = newValue)
+})
+
+let headZIndex = $computed(() => isSticking ? zIndexes.floatingPost : zIndexes.postHead)
 
 </script>
 
@@ -38,10 +83,14 @@ article.quest-post.container.relative(
     class="rounded-md"
 )
 
-    .quest-post-wrapper
+    .quest-post-wrapper.relative
 
         //- 头部
-        .quest-post-head(w:text="sm" class="sticky top-0" w:p="t-1")
+        .quest-post-head(
+            ref="headRef"
+            w:text="sm" class="sticky top-0" w:p="t-1"
+            :style="{ top: `${top}px` }"
+        )
             slot(name="head")
             div(w:clear="both")
             div(class="h-1")
