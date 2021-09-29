@@ -87,9 +87,9 @@ article.quest-post.container.relative(
     .quest-post-wrapper.relative
 
         //- 头部
-        .quest-post-head(
+        .quest-post-head.sticky(
             ref="headRef"
-            w:text="sm" class="sticky top-0" w:p="t-1"
+            w:text="sm" w:p="t-1"
             :style="{ top: `${top}px` }"
         )
             slot(name="head")
@@ -125,6 +125,7 @@ article.quest-post.container.relative(
 }
 
 .quest-post-head {
+    height: max-content;
     z-index: v-bind(headZIndex);
 }
 </style>
