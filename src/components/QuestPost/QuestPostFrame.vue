@@ -2,7 +2,7 @@
 
 import type { DisplayStatus } from '~/types/post-ui'
 import zIndexes from '~/logic/zIndexes'
-import { isInsideCollapsedKey, postContentDivKey } from "~/logic/injectKeys"
+import { postContentDivKey } from "~/logic/injectKeys"
 
 interface Props {
     nestLevel: number
@@ -13,8 +13,6 @@ const props = defineProps<Props>()
 let isRefPost = computed(() => props.nestLevel > 0)
 
 const emit = defineEmits(['expand'])
-
-let isInsideCollapsed = $(inject(isInsideCollapsedKey))
 
 let postContentDivRef: HTMLDivElement | null = $ref(null)
 provide(postContentDivKey, readonly($$(postContentDivRef)))
@@ -34,14 +32,45 @@ function tryExpanding(ev: Event) {
 
 let top = $(inject('offsetTop', ref(0)))
 let height = $ref(0)
-let bottom = $computed(() => top + height)
-provide('offsetTop', readonly($$(bottom)))
+let currentBottom: number | null = $ref(null)
+let fullBottom = $computed(() => top + height)
+let childTop = $computed(() => Math.max(currentBottom ?? fullBottom, top))
+provide('offsetTop', readonly($$(childTop)))
 
-let shouldStick = $computed(() => !isInsideCollapsed && props.displayStatus !== 'floating')
+let sentinelDiv: HTMLDivElement | null = $ref(null)
 
 let headRef: HTMLElement | null = $ref(null);
 onMounted(() => {
     height = headRef!.getBoundingClientRect().height
+
+    const onScroll = (ev: Event) => {
+        // TODO: 更优雅地去除此事件监听器，防止内存泄漏/无益地占用 CPU
+        if (!headRef) {
+            window.removeEventListener('scroll', onScroll)
+            return
+        }
+        const rect = headRef!.getBoundingClientRect()
+        if (rect.top < -height) {
+            window.removeEventListener('scroll', onScroll)
+            currentBottom = height
+            return
+        }
+        currentBottom = rect.bottom
+    }
+    useIntersectionObserver(sentinelDiv, ([{ intersectionRatio }]) => {
+        if (headRef!.getBoundingClientRect().top > height) {
+            return
+        }
+        if (intersectionRatio === 1) {
+            window.removeEventListener('scroll', onScroll)
+            currentBottom = null
+        } else if (intersectionRatio === 0) {
+            window.removeEventListener('scroll', onScroll)
+            currentBottom = 0
+        } else {
+            window.addEventListener('scroll', onScroll)
+        }
+    }, { threshold: [0, 1] })
 })
 
 let headZIndex = zIndexes.postHead
@@ -60,10 +89,10 @@ article.quest-post.container.relative(
         //- 头部
         //- FIXME: 解决用户可能会混淆固定的帖以及悬浮的帖之间的头部的问题
         .quest-post-head(
-            :class="shouldStick ? 'sticky' : undefined"
+            class="sticky"
             ref="headRef"
             w:text="sm" w:p="t-1"
-            :style="{ top: shouldStick ? `${top}px` : undefined }"
+            :style="{ top: `${top}px` }"
         )
             slot(name="head")
             div(w:clear="both")
@@ -91,6 +120,11 @@ article.quest-post.container.relative(
                         div(:class="isRefPost ? 'h-2' : 'h-3'")
 
         div(w:clear="both")
+        div(
+            ref="sentinelDiv"
+            style="position: absolute; left: 0; right: 0; visibility: hidden;"
+            :style="{ height: `${fullBottom}px`, bottom: `${0}px` }"
+        )
 
 </template>
 
