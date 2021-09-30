@@ -4,6 +4,7 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
+    BarWithText: typeof import('./components/misc/BarWithText.vue')['default']
     CarbonCampsite: typeof import('~icons/carbon/campsite')['default']
     CarbonCaretLeft: typeof import('~icons/carbon/caret-left')['default']
     CarbonCaretRight: typeof import('~icons/carbon/caret-right')['default']
@@ -19,7 +20,11 @@ declare module 'vue' {
     IonCaretDown: typeof import('~icons/ion/caret-down')['default']
     IonCaretUp: typeof import('~icons/ion/caret-up')['default']
     OverflowMask: typeof import('./components/misc/OverflowMask.vue')['default']
+    PageLoadButton: typeof import('./components/misc/PageLoadButton.vue')['default']
+    PageNumberControl: typeof import('./components/misc/PageNumberControl.vue')['default']
     PageNumberInput: typeof import('./components/misc/PageNumberInput.vue')['default']
+    PhCaretDoubleDownBold: typeof import('~icons/ph/caret-double-down-bold')['default']
+    PhCaretDoubleUpBold: typeof import('~icons/ph/caret-double-up-bold')['default']
     QuestPost: typeof import('./components/QuestPost/QuestPost.vue')['default']
     QuestPostContent: typeof import('./components/QuestPost/QuestPostContent.vue')['default']
     QuestPostFrame: typeof import('./components/QuestPost/QuestPostFrame.vue')['default']
@@ -27,7 +32,6 @@ declare module 'vue' {
     QuestPostLoader: typeof import('./components/QuestPost/QuestPostLoader.vue')['default']
     QuestPostRefLink: typeof import('./components/QuestPost/QuestPostRefLink.vue')['default']
     QuestThreadPageContent: typeof import('./components/QuestThread/QuestThreadPageContent.vue')['default']
-    QuestThreadPageControl: typeof import('./components/QuestThread/QuestThreadPageControl.vue')['default']
     QuestThreadPageViewer: typeof import('./components/QuestThread/QuestThreadPageViewer.vue')['default']
     README: typeof import('./components/README.md')['default']
   }

@@ -19,8 +19,11 @@ let pageNumbers = $computed(() => function* () {
 
 <template lang="pug">
 
-div(v-for="page in pageNumbers()" :key="page")
-    div(w:h="2")
+div(
+    v-for="page, i in pageNumbers()" :key="page"
+    class="space-y-2"
+)
+    div(v-if="Number(i) !== 0" w:h="2")
     quest-thread-page-content(
         :props="{ type: 'page', page: page }"
         :style="{ zIndex: -page }"

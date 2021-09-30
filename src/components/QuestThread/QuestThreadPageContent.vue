@@ -62,11 +62,8 @@ onMounted(() => {
 .post-page
 
     .post-page-bar
-        .flex
-            .dash
-            div(w:p="x-2")
-                span(w:font="mono") {{ computedProps.description }}
-            .dash
+        bar-with-text
+            span(w:font="mono") {{ computedProps.description }}
 
     div(w:h="2")
 
@@ -80,9 +77,3 @@ onMounted(() => {
                 :style="{ zIndex: zIndexes.post + posts.length - i }"
             )
 </template>
-
-<style scoped lang="scss">
-.post-page-bar .dash {
-    @apply flex-1 h-0 m-auto border-1 border-dashed border-black dark:border-white;
-}
-</style>

@@ -16,17 +16,28 @@ function getTailwindColor(colorName: string) {
     return color
 }
 
-export const postBackgroundColorVariants = (() => {
+export const colorVariants = (() => {
     if (!import.meta.env.SSR) {
         return {
-            light: getTailwindColor('text-post-background-color'),
-            dark: getTailwindColor('text-post-background-color-dark')
+            app: {
+                background: {
+                    light: getTailwindColor('text-white'),
+                    dark: getTailwindColor('text-black'), //getTailwindColor('text-gray-900'),
+                },
+            },
+            post: {
+                background: {
+                    light: getTailwindColor('text-post-background-color'),
+                    dark: getTailwindColor('text-post-background-color-dark'),
+                }
+            },
         }
     }
     return null
 })()
 
-export const postBackgroundColor = computed(() => postBackgroundColorVariants![isDark.value ? 'dark' : 'light'])
+export const appBackgroundColor = computed(() => colorVariants!.app.background![isDark.value ? 'dark' : 'light'])
+export const postBackgroundColor = computed(() => colorVariants!.post.background[isDark.value ? 'dark' : 'light'])
 
 // XXX: 不能有 alpha 值
 /**
