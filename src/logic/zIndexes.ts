@@ -10,10 +10,7 @@ export default {
     post: 2_000_000,
 
     // 折叠时的遮盖
-    overflowMask: 3_000_000,
-
-    // 让悬浮的引用视图不被父引用视图的遮盖效果遮盖到
-    floatingPost: 3_100_000,
+    overflowMask: 1_900_000,
 
     // 帖的头部
     postHead: 3_200_000,

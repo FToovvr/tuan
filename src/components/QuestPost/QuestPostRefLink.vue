@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Ref } from "vue"
 
+import type { DisplayStatus } from "~/types/post-ui"
 import { useStuffStore } from "~/stores/stuff"
 import { postBackgroundColor } from "~/logic/backgroundColor"
 import { remToPx } from "~/logic/units"
@@ -122,7 +123,7 @@ let {
     let isPinned = $ref(false)
     let isCollapsed = $ref(false)
     watch($$(isPinned), (isPinned) => { if (!isPinned) { isCollapsed = false } })
-    let displayStatus: 'closed' | 'floating' | 'open' | 'collapsed' = $computed(() => {
+    let displayStatus: DisplayStatus = $computed(() => {
         if (isPinned) {
             return isCollapsed ? 'collapsed' : 'open'
         }
@@ -185,7 +186,7 @@ onMounted(() => {
 
 let siblingRefLinkCount = $(inject(siblingRefLinkCountKey))
 // @ts-ignore The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-let refPostZIndex = $computed(() => (displayStatus === 'floating') ? zIndexes.floatingPost : (zIndexes.post + (siblingRefLinkCount - props.siblingOrder)))
+let refPostZIndex = $computed(() => zIndexes.post + (siblingRefLinkCount - props.siblingOrder))
 
 </script>
 
@@ -212,7 +213,7 @@ keep-alive
                 :style="{ zIndex: refPostZIndex, maxWidth: maxWidth }"
             )
                 quest-post-loader(
-                    :post-id="postId" :nest-level="nestLevel" :is-collapsed="isCollapsed"
+                    :post-id="postId" :nest-level="nestLevel" :display-status="displayStatus"
                     @expand="onClick('link')"
                 )
                     template(#head-left)

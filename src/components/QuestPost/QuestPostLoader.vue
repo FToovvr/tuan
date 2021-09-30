@@ -1,8 +1,10 @@
 <script setup lang="ts">
 
 import type { Post } from "~/types/post"
+import type { DisplayStatus } from "~/types/post-ui"
 import { useStuffStore } from "~/stores/stuff"
 import { postBackgroundColor } from "~/logic/backgroundColor"
+import { isInsideCollapsedKey } from "~/logic/injectKeys"
 import QuestPostFrame from "./QuestPostFrame.vue"
 
 interface Props {
@@ -10,11 +12,18 @@ interface Props {
     postId?: number
 
     nestLevel?: number
-    isCollapsed?: boolean
+    displayStatus?: DisplayStatus
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+    displayStatus: 'open'
+})
 
 const emit = defineEmits(['expand'])
+
+let isInsideCollapsed = $(inject(isInsideCollapsedKey, ref(false)))
+let innerIsInsideCollapsed = $ref(false)
+provide(isInsideCollapsedKey, readonly($$(innerIsInsideCollapsed)))
+watch(toRef(props, 'displayStatus'), newValue => innerIsInsideCollapsed = (isInsideCollapsed || newValue === 'collapsed'), { immediate: true })
 
 const stuffStore = useStuffStore()
 
@@ -38,7 +47,7 @@ let post = $((() => {
 <template lang="pug">
 template(v-if="post")
     quest-post(
-        :post="post" :nest-level="nestLevel ?? 0" :is-collapsed="isCollapsed ?? false"
+        :post="post" :nest-level="nestLevel ?? 0" :display-status="displayStatus"
         @expand="emit('expand')"
         v-bind="$attrs"
     )
@@ -46,7 +55,7 @@ template(v-if="post")
             slot(name="head-left")
 template(v-else)
     quest-post-frame(
-        :nest-level="nestLevel ?? 0" :is-collapsed="isCollapsed ?? false" :background-color-rgb-hex="postBackgroundColor"
+        :nest-level="nestLevel ?? 0" :display-status="displayStatus" :background-color-rgb-hex="postBackgroundColor"
         @expand="emit('expand')"
         v-bind="$attrs"
     )

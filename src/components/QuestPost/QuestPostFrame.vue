@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { Ref } from 'vue'
 
+import type { DisplayStatus } from '~/types/post-ui'
 import zIndexes from '~/logic/zIndexes'
-import { postContentDivKey } from "~/logic/injectKeys"
+import { isInsideCollapsedKey, postContentDivKey } from "~/logic/injectKeys"
 
 interface Props {
     nestLevel: number
-    isCollapsed: boolean
+    displayStatus: DisplayStatus
     backgroundColorRgbHex: string
 }
 const props = defineProps<Props>()
@@ -14,12 +14,14 @@ let isRefPost = computed(() => props.nestLevel > 0)
 
 const emit = defineEmits(['expand'])
 
+let isInsideCollapsed = $(inject(isInsideCollapsedKey))
+
 let postContentDivRef: HTMLDivElement | null = $ref(null)
 provide(postContentDivKey, readonly($$(postContentDivRef)))
 
 function tryExpanding(ev: Event) {
     // TODO: 点击内部固定的引用视图，如果对应内部视图没有触发操作，则展开外部视图自身
-    if (props.isCollapsed) {
+    if (props.displayStatus === 'collapsed') {
         emit('expand')
         if (ev.target instanceof HTMLElement && ev.target.classList.contains('ref-post-link')) {
             // 不 stopPropagation
@@ -35,45 +37,14 @@ let height = $ref(0)
 let bottom = $computed(() => top + height)
 provide('offsetTop', readonly($$(bottom)))
 
-// 不知为何，除了根部的帖和自动打开的引用视图外，
-// 新创立的引用视图的 headRef 会引用到一处无内部内容的元素
+let shouldStick = $computed(() => !isInsideCollapsed && props.displayStatus !== 'floating')
+
 let headRef: HTMLElement | null = $ref(null);
-let isSticking = $ref(false)
 onMounted(() => {
     height = headRef!.getBoundingClientRect().height
-
-    // 需要放在 onMounted 里就才能运作…
-    watch((function useIsSticking(_headRef: Ref<HTMLElement | null>) {
-        let headRef = $(_headRef)
-
-        let listener: EventListener | null = $ref(null)
-
-        let isSticking = $ref(false)
-
-        useIntersectionObserver(headRef, ([{ isIntersecting }]) => {
-            if (isIntersecting) {
-                listener = (ev: Event) => {
-                    if (!headRef) {
-                        // 翻页导致帖被卸下了
-                        // TODO: 这么做有些偷懒，不知有无更优雅的方式
-                        window.removeEventListener('scroll', listener!)
-                        return
-                    }
-                    isSticking = headRef!.offsetTop > top
-                }
-                window.addEventListener('scroll', listener)
-            } else {
-                if (listener) {
-                    window.removeEventListener('scroll', listener)
-                }
-            }
-        })
-
-        return $$(isSticking)
-    })($$(headRef)), (newValue) => isSticking = newValue)
 })
 
-let headZIndex = $computed(() => isSticking ? zIndexes.floatingPost : zIndexes.postHead)
+let headZIndex = zIndexes.postHead
 
 </script>
 
@@ -87,10 +58,12 @@ article.quest-post.container.relative(
     .quest-post-wrapper.relative
 
         //- 头部
-        .quest-post-head.sticky(
+        //- FIXME: 解决用户可能会混淆固定的帖以及悬浮的帖之间的头部的问题
+        .quest-post-head(
+            :class="shouldStick ? 'sticky' : undefined"
             ref="headRef"
             w:text="sm" w:p="t-1"
-            :style="{ top: `${top}px` }"
+            :style="{ top: shouldStick ? `${top}px` : undefined }"
         )
             slot(name="head")
             div(w:clear="both")
@@ -102,12 +75,12 @@ article.quest-post.container.relative(
         //- 正文（+附图）
         .relative(ref="postContentDivRef")
             overflow-mask(
-                v-if="isCollapsed"
+                v-if="displayStatus === 'collapsed'"
                 @click.capture="tryExpanding"
                 :background-color-rgb-hex="backgroundColorRgbHex"
                 z-index
             )
-            div(:class="isCollapsed ? 'max-h-15 overflow-hidden' : undefined")
+            div(:class="displayStatus === 'collapsed' ? 'max-h-15 overflow-hidden' : undefined")
                 .quest-post-content-wrapper
                     .relative.quest-post-ref-wrapper
                     div(@click.capture="tryExpanding")

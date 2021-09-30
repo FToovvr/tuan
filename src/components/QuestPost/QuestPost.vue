@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import type { Post } from "~/types/post"
+import type { DisplayStatus } from "~/types/post-ui"
 import QuestPostFrame from "./QuestPostFrame.vue"
 import { postBackgroundColor } from "~/logic/backgroundColor"
 
@@ -8,7 +9,7 @@ interface Props {
     post: Post // 帖内容或帖号
 
     nestLevel: number
-    isCollapsed: boolean
+    displayStatus: DisplayStatus
 }
 const props = defineProps<Props>()
 let isRefPost = $computed(() => (props.nestLevel) > 0)
@@ -31,7 +32,7 @@ let createdAt = $computed(() => {
 quest-post-frame(
     v-if="post"
     :id="isRefPost ? undefined : 'id-' + post.postId"
-    :nest-level="nestLevel" :is-collapsed="isCollapsed" :background-color-rgb-hex="postBackgroundColor"
+    :nest-level="nestLevel" :display-status="displayStatus" :background-color-rgb-hex="postBackgroundColor"
     @expand="emit('expand')"
 )
 
