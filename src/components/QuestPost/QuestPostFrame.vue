@@ -51,7 +51,7 @@ let headZIndex = zIndexes.postHead
 <template lang="pug">
 article.quest-post.container.relative(
     w:border="1 dark:gray"
-    :class="isRefPost ? '!border-gray-400 px-3' : 'pt-2 px-6'"
+    :class="isRefPost ? '!border-gray-400 px-1' : 'px-4 pt-0.5'"
     class="rounded-md"
 )
 
@@ -70,7 +70,7 @@ article.quest-post.container.relative(
             div(class="h-1")
             hr(w:m="x-0.5" w:border="dashed gray-400")
 
-        div(:class="isRefPost ? 'h-1' : 'h-3'")
+        div(:class="isRefPost ? 'h-1.5' : 'h-1'")
 
         //- 正文（+附图）
         .relative(ref="postContentDivRef")
@@ -83,7 +83,10 @@ article.quest-post.container.relative(
             div(:class="displayStatus === 'collapsed' ? 'max-h-15 overflow-hidden' : undefined")
                 .quest-post-content-wrapper
                     .relative.quest-post-ref-wrapper
-                    div(@click.capture="tryExpanding")
+                    div(
+                        @click.capture="tryExpanding"
+                        :class="isRefPost ? 'px-2' : 'px-2'"
+                    )
                         slot(name="content")
                         div(:class="isRefPost ? 'h-2' : 'h-3'")
 
