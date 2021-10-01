@@ -21,9 +21,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['expand'])
 
 let isInsideCollapsed = $(inject(isInsideCollapsedKey, ref(false)))
-let innerIsInsideCollapsed = $ref(false)
+let innerIsInsideCollapsed = $computed(() => isInsideCollapsed || props.displayStatus === 'collapsed')
 provide(isInsideCollapsedKey, readonly($$(innerIsInsideCollapsed)))
-watch(toRef(props, 'displayStatus'), newValue => innerIsInsideCollapsed = (isInsideCollapsed || newValue === 'collapsed'), { immediate: true })
 
 const stuffStore = useStuffStore()
 

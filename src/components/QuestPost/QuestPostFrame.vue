@@ -37,38 +37,61 @@ let fullBottom = $computed(() => top + height)
 let childTop = $computed(() => Math.max(currentBottom ?? fullBottom, top))
 provide('offsetTop', readonly($$(childTop)))
 
+// 若此 Div 部分接触到 viewport 上方边缘，代表头部被遮盖
 let sentinelDiv: HTMLDivElement | null = $ref(null)
 
-let headRef: HTMLElement | null = $ref(null);
+let headRef: HTMLElement | null = $ref(null)
+let headVisibility: 'aboveScreen' | 'onScreen' | 'partiallyCoveredByTopEdge' | null = $ref(null)
+
+const onScroll = (ev: Event) => {
+    // TODO: 更优雅地去除此事件监听器，防止内存泄漏/无益地占用 CPU
+    if (!headRef) {
+        window.removeEventListener('scroll', onScroll)
+        return
+    }
+    const rect = headRef!.getBoundingClientRect()
+    currentBottom = rect.bottom
+}
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
+
+watch($$(headVisibility), () => {
+    switch (headVisibility) {
+        case 'onScreen': {
+            window.removeEventListener('scroll', onScroll)
+            currentBottom = null
+        }
+            break
+        case 'aboveScreen': {
+            window.removeEventListener('scroll', onScroll)
+            currentBottom = 0
+        }
+            break
+        case 'partiallyCoveredByTopEdge': {
+            window.addEventListener('scroll', onScroll)
+        }
+            break
+    }
+})
+
 onMounted(() => {
     height = headRef!.getBoundingClientRect().height
-
-    const onScroll = (ev: Event) => {
-        // TODO: 更优雅地去除此事件监听器，防止内存泄漏/无益地占用 CPU
-        if (!headRef) {
-            window.removeEventListener('scroll', onScroll)
-            return
-        }
-        const rect = headRef!.getBoundingClientRect()
-        if (rect.top < -height) {
-            window.removeEventListener('scroll', onScroll)
-            currentBottom = height
-            return
-        }
-        currentBottom = rect.bottom
-    }
     useIntersectionObserver(sentinelDiv, ([{ intersectionRatio }]) => {
-        if (headRef!.getBoundingClientRect().top > height) {
+        const sentinelRect = sentinelDiv!.getBoundingClientRect()
+        if (sentinelRect.top > 0 && sentinelRect.bottom > window.innerHeight / 2) {
+            // 自下方而来
             return
         }
         if (intersectionRatio === 1) {
-            window.removeEventListener('scroll', onScroll)
-            currentBottom = null
+            headVisibility = 'onScreen'
         } else if (intersectionRatio === 0) {
-            window.removeEventListener('scroll', onScroll)
-            currentBottom = 0
+            if (headVisibility === 'aboveScreen') {
+                // FIXME: 不知为何第二层起进入屏幕时 observer 会触发第二次 0，故作此 workaround
+                headVisibility = 'partiallyCoveredByTopEdge'
+            } else {
+                headVisibility = 'aboveScreen'
+            }
         } else {
-            window.addEventListener('scroll', onScroll)
+            headVisibility = 'partiallyCoveredByTopEdge'
         }
     }, { threshold: [0, 1] })
 })
@@ -88,8 +111,7 @@ article.quest-post.container.relative(
 
         //- 头部
         //- FIXME: 解决用户可能会混淆固定的帖以及悬浮的帖之间的头部的问题
-        .quest-post-head(
-            class="sticky"
+        .quest-post-head.sticky(
             ref="headRef"
             w:text="sm" w:p="t-1"
             :style="{ top: `${top}px` }"
@@ -123,7 +145,7 @@ article.quest-post.container.relative(
         div(
             ref="sentinelDiv"
             style="position: absolute; left: 0; right: 0; visibility: hidden;"
-            :style="{ height: `${fullBottom}px`, bottom: `${0}px` }"
+            :style="{ height: `${height}px`, bottom: `${top}px` }"
         )
 
 </template>
