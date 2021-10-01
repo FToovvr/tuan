@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Ref } from 'vue'
 
 import type { DisplayStatus } from '~/types/post-ui'
 import zIndexes from '~/logic/zIndexes'
@@ -30,71 +31,88 @@ function tryExpanding(ev: Event) {
     }
 }
 
+let headRef: HTMLElement | null = $ref(null)
+
 let top = $(inject('offsetTop', ref(0)))
 let height = $ref(0)
-let currentBottom: number | null = $ref(null)
-let fullBottom = $computed(() => top + height)
-let childTop = $computed(() => Math.max(currentBottom ?? fullBottom, top))
-provide('offsetTop', readonly($$(childTop)))
+onMounted(() => useResizeObserver(headRef, ([e]) => height = e.contentRect.height))
 
 // 若此 Div 部分接触到 viewport 上方边缘，代表头部被遮盖
-let sentinelDiv: HTMLDivElement | null = $ref(null)
+// 部分参考 https://developers.google.com/web/updates/2017/09/sticky-headers
+let sentinelDiv: HTMLElement | null = $ref(null)
 
-let headRef: HTMLElement | null = $ref(null)
-let headVisibility: 'aboveScreen' | 'onScreen' | 'partiallyCoveredByTopEdge' | null = $ref(null)
+let { childTop } = $(function useMultipleLevelSticky(
+    _headRef: Ref<HTMLElement | null>, _sentinelDiv: Ref<HTMLElement | null>,
+    _top: Ref<number>, _height: Ref<number>
+) {
+    let sentinelDiv = $(_sentinelDiv)
+    let headRef = $(_headRef)
+    let top = $(_top)
+    let height = $(_height)
 
-const onScroll = (ev: Event) => {
-    // TODO: 更优雅地去除此事件监听器，防止内存泄漏/无益地占用 CPU
-    if (!headRef) {
-        window.removeEventListener('scroll', onScroll)
-        return
-    }
-    const rect = headRef!.getBoundingClientRect()
-    currentBottom = rect.bottom
-}
-onUnmounted(() => window.removeEventListener('scroll', onScroll))
+    let currentBottom: number | null = $ref(null)
+    let fullBottom = $computed(() => top + height)
+    let childTop = $computed(() => Math.max(currentBottom ?? fullBottom, top))
 
-watch($$(headVisibility), () => {
-    switch (headVisibility) {
-        case 'onScreen': {
+    let headVisibility: 'aboveScreen' | 'onScreen' | 'partiallyCoveredByTopEdge' | null = $ref(null)
+
+    const onScroll = (ev: Event) => {
+        // TODO: 更优雅地去除此事件监听器，防止内存泄漏/无益地占用 CPU
+        if (!headRef) {
             window.removeEventListener('scroll', onScroll)
-            currentBottom = null
-        }
-            break
-        case 'aboveScreen': {
-            window.removeEventListener('scroll', onScroll)
-            currentBottom = 0
-        }
-            break
-        case 'partiallyCoveredByTopEdge': {
-            window.addEventListener('scroll', onScroll)
-        }
-            break
-    }
-})
-
-onMounted(() => {
-    height = headRef!.getBoundingClientRect().height
-    useIntersectionObserver(sentinelDiv, ([{ intersectionRatio }]) => {
-        const sentinelRect = sentinelDiv!.getBoundingClientRect()
-        if (sentinelRect.top > 0 && sentinelRect.bottom > window.innerHeight / 2) {
-            // 自下方而来
             return
         }
-        if (intersectionRatio === 1) {
-            headVisibility = 'onScreen'
-        } else if (intersectionRatio === 0) {
-            if (headVisibility === 'aboveScreen') {
-                // FIXME: 不知为何第二层起进入屏幕时 observer 会触发第二次 0，故作此 workaround
-                headVisibility = 'partiallyCoveredByTopEdge'
-            } else {
-                headVisibility = 'aboveScreen'
+        const rect = headRef!.getBoundingClientRect()
+        currentBottom = rect.bottom
+    }
+    onUnmounted(() => window.removeEventListener('scroll', onScroll))
+
+    onMounted(() =>
+        useIntersectionObserver(sentinelDiv, ([{ intersectionRatio }]) => {
+            const sentinelRect = sentinelDiv!.getBoundingClientRect()
+            if (sentinelRect.top > 0 && sentinelRect.bottom > window.innerHeight / 2) {
+                // 自下方而来
+                return
             }
-        } else {
-            headVisibility = 'partiallyCoveredByTopEdge'
+            if (intersectionRatio === 1) {
+                headVisibility = 'onScreen'
+            } else if (intersectionRatio === 0) {
+                if (headVisibility === 'aboveScreen') {
+                    // FIXME: 不知为何第二层起进入屏幕时 observer 会触发第二次 0，故作此 workaround
+                    headVisibility = 'partiallyCoveredByTopEdge'
+                } else {
+                    headVisibility = 'aboveScreen'
+                }
+            } else {
+                headVisibility = 'partiallyCoveredByTopEdge'
+            }
+        }, { threshold: [0, 1] })
+    )
+
+    watch($$(headVisibility), () => {
+        switch (headVisibility) {
+            case 'onScreen': {
+                window.removeEventListener('scroll', onScroll)
+                currentBottom = null
+            }
+                break
+            case 'aboveScreen': {
+                window.removeEventListener('scroll', onScroll)
+                currentBottom = 0
+            }
+                break
+            case 'partiallyCoveredByTopEdge': {
+                window.addEventListener('scroll', onScroll)
+            }
+                break
         }
-    }, { threshold: [0, 1] })
-})
+    })
+
+    return { childTop: $$(childTop) }
+
+}($$(headRef), $$(sentinelDiv), $$(top), $$(height)))
+
+provide('offsetTop', readonly($$(childTop)))
 
 let headZIndex = zIndexes.postHead
 
