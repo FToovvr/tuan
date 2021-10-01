@@ -59,7 +59,7 @@ onMounted(() => {
 </script>
 
 <template lang="pug">
-.post-page
+.post-page(:id="_outerProps.props.type === 'page' ? `page-${_outerProps.props.page}` : undefined")
 
     .post-page-bar
         bar-with-text

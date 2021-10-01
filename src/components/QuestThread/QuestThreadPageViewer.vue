@@ -7,10 +7,13 @@ interface Props {
 }
 const props = defineProps<Props>()
 
+const emit = defineEmits(['ready'])
+
+onMounted(() => nextTick(() => emit('ready')))
+onUpdated(() => nextTick(() => emit('ready')))
+
 let pageNumbers = $computed(() => function* () {
-    // 不要 reactive 
-    const { pageStart, pageEnd } = props
-    for (let i = pageStart; i <= pageEnd; i++) {
+    for (let i = props.pageStart; i <= props.pageEnd; i++) {
         yield i
     }
 })
@@ -19,10 +22,7 @@ let pageNumbers = $computed(() => function* () {
 
 <template lang="pug">
 
-div(
-    v-for="page, i in pageNumbers()" :key="page"
-    class="space-y-2"
-)
+div(v-for="page, i in pageNumbers()" :key="page")
     div(v-if="Number(i) !== 0" w:h="2")
     quest-thread-page-content(
         :props="{ type: 'page', page: page }"
