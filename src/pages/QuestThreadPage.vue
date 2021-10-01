@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
 import { useStuffStore } from '~/stores/stuff'
+import { currentPageNumberKey, currentPostIdKey } from '~/logic/injectKeys'
+
 import FixedWrapper from '~/components/misc/FixedWrapper.vue'
 
 const route = useRoute()
@@ -20,9 +22,13 @@ onMounted(async () => {
 })
 
 let currentPageNumber = $ref(Number(page))
-watch($$(currentPageNumber), () => {
+let currentPostId: number | null = $ref(null)
+provide(currentPageNumberKey, $$(currentPageNumber))
+provide(currentPostIdKey, $$(currentPostId))
+throttledWatch([$$(currentPageNumber), $$(currentPostId)], () => {
     history.replaceState({}, '', String(currentPageNumber))
-})
+    history.replaceState({}, '', currentPostId ? `#id-${currentPostId}` : '')
+}, { throttle: 300 })
 
 // TODO
 let startPageNumber = $ref(currentPageNumber)
@@ -60,7 +66,7 @@ function jumpToPage() {
     if (pageToJumpTo) { pageToJumpTo = null }
 }
 
-function gotoPage(toPage: number) {
+function gotoPage(toPage: number, from?: 'control') {
     if (toPage >= startPageNumber && toPage <= endPageNumber) {
         // noop
     } else if (toPage === startPageNumber - 1) {
@@ -88,7 +94,10 @@ onMounted(() => {
 <template lang="pug">
 div(class="max-w-2xl mx-auto")
     fixed-wrapper.page-control(class="bottom-2 sm:bottom-6")
-        page-number-control(v-model.number="currentPageNumber" :max="maxPageNumber", @update:model-value="gotoPage($event)")
+        page-number-control(
+            v-model.number="currentPageNumber" :max="maxPageNumber"
+            @update:model-value="gotoPage($event, 'control')"
+        )
 
     | {{ folder }} &gt; {{ quest }}
     hr

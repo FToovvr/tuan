@@ -4,6 +4,7 @@ import QuestPostLoader from "../QuestPost/QuestPostLoader.vue";
 
 import { useStuffStore } from "~/stores/stuff";
 import zIndexes from "~/logic/zIndexes"
+import { pageNumberKey } from "~/logic/injectKeys";
 
 interface PropOffset {
     type: 'offset'
@@ -21,6 +22,9 @@ interface Props {
     props: PropOffset | PropPage
 }
 const _outerProps = defineProps<Props>()
+
+let pageNumber = $computed(() => _outerProps.props.type === 'page' ? _outerProps.props.page : null)
+provide(pageNumberKey, $$(pageNumber))
 
 let computedProps = $computed(() => {
     const _props = toRef(_outerProps, 'props')
@@ -59,7 +63,7 @@ onMounted(() => {
 </script>
 
 <template lang="pug">
-.post-page(:id="_outerProps.props.type === 'page' ? `page-${_outerProps.props.page}` : undefined")
+.post-page(:id="pageNumber !== null ? `page-${pageNumber}` : undefined")
 
     .post-page-bar
         bar-with-text
