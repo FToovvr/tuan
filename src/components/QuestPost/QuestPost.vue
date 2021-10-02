@@ -29,7 +29,9 @@ let createdAt = $computed(() => {
     return `${datePart} ${timePart}`
 })
 
+// @ts-ignore … is declared but its value is never read.
 let currentPageNumber = $(inject(currentPageNumberKey))
+// @ts-ignore … is declared but its value is never read.
 let currentPostId = $(inject(currentPostIdKey))
 let topSentinelDiv: HTMLElement | null = $ref(null)
 let bottomSentinelDiv: HTMLElement | null = $ref(null)
@@ -37,7 +39,9 @@ onMounted(() => {
     if (props.nestLevel > 0) { return }
     // 只为主帖
     // TODO: 合并两个 IntersectionObserver？
-    useIntersectionObserver($$(topSentinelDiv), ([{ intersectionRatio }]) => {
+    let topFisrtTime = true
+    useIntersectionObserver($$(topSentinelDiv), ([{ intersectionRatio, boundingClientRect: { y } }]) => {
+        if (topFisrtTime) { topFisrtTime = false; return }
         if (intersectionRatio < 1 && topSentinelDiv!.getBoundingClientRect().top < 0) {
             if (pageNumber) {
                 // @ts-ignore 类型推断有问题
@@ -47,8 +51,14 @@ onMounted(() => {
             currentPostId = post.postId
         }
     }, { threshold: 1 })
-    useIntersectionObserver($$(bottomSentinelDiv), ([{ intersectionRatio }]) => {
-        if (intersectionRatio === 1 && bottomSentinelDiv!.getBoundingClientRect().top <= window.innerHeight / 2) {
+    let previousBottomY: number | null = null
+    useIntersectionObserver($$(bottomSentinelDiv), ([{ intersectionRatio, boundingClientRect: { y } }]) => {
+        if (previousBottomY === null || previousBottomY > window.innerHeight) {
+            previousBottomY = y
+            return
+        }
+        previousBottomY = y
+        if (intersectionRatio === 1) {
             if (pageNumber) {
                 // @ts-ignore 类型推断有问题
                 currentPageNumber = pageNumber

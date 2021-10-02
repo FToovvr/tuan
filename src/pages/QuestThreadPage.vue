@@ -76,6 +76,9 @@ function gotoPage(toPage: number, from?: 'control') {
     } else {
         startPageNumber = toPage
         endPageNumber = toPage
+        currentPostId = null
+        // 否则跳页后滚动高度仍处于原先滚动高度
+        window.scrollTo({ top: 0 })
     }
     pageToJumpTo = toPage
 }
