@@ -40,16 +40,20 @@ onMounted(() => {
     useIntersectionObserver($$(topSentinelDiv), ([{ intersectionRatio }]) => {
         if (intersectionRatio < 1 && topSentinelDiv!.getBoundingClientRect().top < 0) {
             if (pageNumber) {
+                // @ts-ignore 类型推断有问题
                 currentPageNumber = pageNumber
             }
+            // @ts-ignore 类型推断有问题
             currentPostId = post.postId
         }
     }, { threshold: 1 })
     useIntersectionObserver($$(bottomSentinelDiv), ([{ intersectionRatio }]) => {
         if (intersectionRatio === 1 && bottomSentinelDiv!.getBoundingClientRect().top <= window.innerHeight / 2) {
             if (pageNumber) {
+                // @ts-ignore 类型推断有问题
                 currentPageNumber = pageNumber
             }
+            // @ts-ignore 类型推断有问题
             currentPostId = post.postId
         }
     }, { threshold: 1 })
@@ -65,6 +69,7 @@ div
         :id="isRefPost ? undefined : 'id-' + post.postId"
         :nest-level="nestLevel" :display-status="displayStatus" :background-color-rgb-hex="postBackgroundColor"
         @expand="emit('expand')"
+        v-bind="$attrs"
     )
 
         template(#head)
