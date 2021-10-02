@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+import gsap from 'gsap'
+
 import { useStuffStore } from '~/stores/stuff'
 import { currentPageNumberKey, currentPostIdKey } from '~/logic/injectKeys'
 
@@ -57,12 +59,25 @@ function loadPreviousPage() {
     })
 }
 
+interface ScrollOption {
+    behavior?: 'smooth' | 'auto'
+}
 let pageToJumpTo: number | null = $ref(null)
-let jumpToPageOptions: ScrollIntoViewOptions | null = $ref(null)
-const defaultJumpToPageOptions: ScrollIntoViewOptions = { behavior: 'smooth' }
+let jumpToPageOptions: ScrollOption | null = $ref(null)
 function jumpToPage() {
     if (!pageToJumpTo) { return }
-    getPageElement(pageToJumpTo)!.scrollIntoView({ ...defaultJumpToPageOptions, ...jumpToPageOptions })
+    const finalOptions = { ...{ behavior: 'smooth' }, ...jumpToPageOptions }
+    if (finalOptions!.behavior === 'auto') {
+        getPageElement(pageToJumpTo)!.scrollIntoView()
+    } else {
+        stuffStore.isInAutoScrolling = true
+        gsap.to(window, {
+            scrollTo: getPageElement(pageToJumpTo)!.getBoundingClientRect().top + window.scrollY,
+            onComplete: () => {
+                stuffStore.isInAutoScrolling = false
+            }
+        })
+    }
     if (pageToJumpTo) { pageToJumpTo = null }
 }
 
@@ -76,10 +91,10 @@ function gotoPage(toPage: number, from?: 'control') {
     } else {
         startPageNumber = toPage
         endPageNumber = toPage
-        currentPostId = null
         // 否则跳页后滚动高度仍处于原先滚动高度
         window.scrollTo({ top: 0 })
     }
+    currentPostId = null
     pageToJumpTo = toPage
 }
 

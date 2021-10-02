@@ -23,6 +23,8 @@ let pageNumber = $(inject(pageNumberKey))
 
 let post = $(toRef(props, 'post'))
 
+const stuffStore = useStuffStore()
+
 let createdAt = $computed(() => {
     const createdAtUtc8 = post!.createdAtUtc + 60 * 60 * 80;
     const isoString = (new Date(createdAtUtc8 * 1000)).toISOString()
@@ -44,6 +46,7 @@ onMounted(() => {
     let topFisrtTime = true
     useIntersectionObserver($$(topSentinelDiv), ([{ intersectionRatio, boundingClientRect: { y } }]) => {
         if (topFisrtTime) { topFisrtTime = false; return }
+        if (stuffStore.isInAutoScrolling) { return }
         if (intersectionRatio < 1 && topSentinelDiv!.getBoundingClientRect().top < 0) {
             if (pageNumber) {
                 // @ts-ignore 类型推断有问题
@@ -60,6 +63,7 @@ onMounted(() => {
             return
         }
         previousBottomY = y
+        if (stuffStore.isInAutoScrolling) { return }
         if (intersectionRatio === 1) {
             if (pageNumber) {
                 // @ts-ignore 类型推断有问题

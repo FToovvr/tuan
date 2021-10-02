@@ -14,6 +14,7 @@ export const useStuffStore = defineStore('stuff', {
     rootPostWidth: 0,
 
     postToScrollTo: null as number | null,
+    isInAutoScrolling: false,
   }),
   actions: {
 

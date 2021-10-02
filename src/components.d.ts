@@ -5,18 +5,11 @@
 declare module 'vue' {
   export interface GlobalComponents {
     BarWithText: typeof import('./components/misc/BarWithText.vue')['default']
-    CarbonCampsite: typeof import('~icons/carbon/campsite')['default']
-    CarbonCaretLeft: typeof import('~icons/carbon/caret-left')['default']
-    CarbonCaretRight: typeof import('~icons/carbon/caret-right')['default']
-    CarbonDicomOverlay: typeof import('~icons/carbon/dicom-overlay')['default']
-    CarbonLanguage: typeof import('~icons/carbon/language')['default']
     CarbonLogoGithub: typeof import('~icons/carbon/logo-github')['default']
     CarbonMoon: typeof import('~icons/carbon/moon')['default']
     CarbonSun: typeof import('~icons/carbon/sun')['default']
     FixedWrapper: typeof import('./components/misc/FixedWrapper.vue')['default']
-    Footer: typeof import('./components/layout/Footer.vue')['default']
     GlobalHeader: typeof import('./components/layout/GlobalHeader.vue')['default']
-    Header: typeof import('./components/layout/Header.vue')['default']
     IonCaretDown: typeof import('~icons/ion/caret-down')['default']
     IonCaretUp: typeof import('~icons/ion/caret-up')['default']
     OverflowMask: typeof import('./components/misc/OverflowMask.vue')['default']
