@@ -16,10 +16,23 @@ import 'virtual:windi-devtools'
 import routes from './routes'
 const routesWithLayout = setupLayouts(routes)
 
+import { useStuffStore } from './stores/stuff'
+
 // https://github.com/antfu/vite-ssg
 export const createApp = ViteSSG(
   App,
-  { routes: routesWithLayout },
+  {
+    routes: routesWithLayout,
+    scrollBehavior: (to, from, savedPosition) => {
+      if (to.hash) {
+        const g = /^#id\-(\d+)$/.exec(to.hash)
+        if (g) {
+          const store = useStuffStore()
+          store.postToScrollTo = Number(g[1])
+        }
+      }
+    }
+  },
   (ctx) => {
     // install all modules under `modules/`
     Object.values(import.meta.globEager('./modules/*.ts')).map(i => i.install?.(ctx))

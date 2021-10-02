@@ -2,9 +2,11 @@
 
 import type { Post } from "~/types/post"
 import type { DisplayStatus } from "~/types/post-ui"
-import QuestPostFrame from "./QuestPostFrame.vue"
 import { postBackgroundColor } from "~/logic/backgroundColor"
 import { currentPageNumberKey, currentPostIdKey, pageNumberKey } from "~/logic/injectKeys"
+import { useStuffStore } from "~/stores/stuff"
+
+import QuestPostFrame from "./QuestPostFrame.vue"
 
 interface Props {
     post: Post // 帖内容或帖号
@@ -67,6 +69,18 @@ onMounted(() => {
             currentPostId = post.postId
         }
     }, { threshold: 1 })
+})
+
+onMounted(() => {
+    if (props.nestLevel === 0) {
+        nextTick(() => {
+            const sutffStore = useStuffStore()
+            if (sutffStore.postToScrollTo === props.post.postId) {
+                topSentinelDiv!.scrollIntoView()
+                sutffStore.postToScrollTo = null
+            }
+        })
+    }
 })
 
 </script>

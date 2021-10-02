@@ -12,6 +12,8 @@ export const useStuffStore = defineStore('stuff', {
 
     // 最外层帖的宽度
     rootPostWidth: 0,
+
+    postToScrollTo: null as number | null,
   }),
   actions: {
 
