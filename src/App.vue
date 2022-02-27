@@ -16,7 +16,9 @@ useHead({
   ],
 })
 
-initializeStuffStore('/assets/data')
+const isProduction = import.meta.env.MODE === 'production'
+
+initializeStuffStore(`${isProduction ? '/tuan' : ''}/assets/data`)
 
 </script>
 

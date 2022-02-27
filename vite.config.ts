@@ -16,7 +16,10 @@ import LinkAttributes from 'markdown-it-link-attributes'
 
 const markdownWrapperClasses = 'prose prose-sm m-auto text-left'
 
+const isProduction = process.env['NODE_ENV'] === 'production'
+
 export default defineConfig({
+  base: isProduction ? '/tuan' : '/',
   resolve: {
     alias: {
       '~/': `${path.resolve(__dirname, 'src')}/`,
