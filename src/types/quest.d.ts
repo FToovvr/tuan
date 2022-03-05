@@ -2,6 +2,7 @@ import type { Post } from "./post";
 
 export interface Quest {
     baseUrl: string
+    lfsBaseUrl: string
 
     folder: string
     name: string

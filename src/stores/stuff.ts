@@ -6,6 +6,7 @@ import { Post, RawPostJson, rawPostToPost } from '~/types/post'
 export const useStuffStore = defineStore('stuff', {
   state: () => ({
     baseUrl: null as string | null, // XXX: 初始化后不应改变
+    lfsBaseUrl: null as string | null,
 
     quests: new Map<string, Quest>(),
     currentQuest: null as Quest | null,
@@ -27,12 +28,13 @@ export const useStuffStore = defineStore('stuff', {
       if (this.quests.has(path)) {
         return this.quests.get(path)!
       }
-      if (!this.baseUrl) {
-        throw new Error('baseUrl is null')
+      if (!this.baseUrl || !this.lfsBaseUrl) {
+        throw new Error(`baseUrl(${this.baseUrl}) or lfsBaseUrl(${this.lfsBaseUrl}) is null`)
       }
 
       let quest = $ref({
         baseUrl: this.baseUrl,
+        lfsBaseUrl: this.lfsBaseUrl,
         folder, name: questName,
         postOwner: 'bb82mcm', // TODO
         posts: null,
@@ -59,9 +61,10 @@ export const useStuffStore = defineStore('stuff', {
   }
 })
 
-export function initializeStuffStore(baseUrl: string) {
+export function initializeStuffStore(args: { baseUrl: string, lfsBaseUrl: string }) {
   const store = useStuffStore()
-  store.baseUrl = baseUrl
+  store.baseUrl = args.baseUrl
+  store.lfsBaseUrl = args.lfsBaseUrl
 }
 
 if (import.meta.hot)

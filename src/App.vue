@@ -18,7 +18,14 @@ useHead({
 
 const isProduction = import.meta.env.MODE === 'production'
 
-initializeStuffStore(`${isProduction ? '/tuan' : ''}/assets/data`)
+initializeStuffStore({
+  'baseUrl': (isProduction ? '/tuan' : '') + `/assets/data`,
+  // Workaround: Github Pages 不能直接加载 lfs 文件
+  'lfsBaseUrl': (isProduction ? (() => {
+    const ghPagesUserName = /^(.*?)\./.exec(window.location.hostname)![1]
+    return `https://media.githubusercontent.com/media/${ghPagesUserName}/tuan/gh-pages`
+  })() : '') + `/assets/data`,
+})
 
 </script>
 

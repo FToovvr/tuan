@@ -34,7 +34,7 @@ export function rawPostToPost(raw: RawPostJson, quest: Quest, floorNumber: numbe
         imageUrl: !raw.attachment_base ? undefined : (() => {
             const fullImageName = `${raw.attachment_base}${raw.attachment_extension}`
             const imageName = fullImageName.split('/')[1]
-            return `${quest.baseUrl}/${quest.folder}/${quest.name}/attachments/${imageName}`
+            return `${quest.lfsBaseUrl}/${quest.folder}/${quest.name}/attachments/${imageName}`
         })(),
     } as Post
 }
