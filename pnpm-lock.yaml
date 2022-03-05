@@ -16,7 +16,6 @@ specifiers:
   cross-env: ^7.0.3
   dompurify: ^2.3.6
   eslint: ^7.32.0
-  gsap: ^3.9.1
   https-localhost: ^4.7.1
   markdown-it-link-attributes: ^3.0.0
   markdown-it-prism: ^2.2.3
@@ -47,7 +46,6 @@ dependencies:
   '@vueuse/core': 6.9.2_vue@3.2.31
   '@vueuse/head': 0.6.0_vue@3.2.31
   dompurify: 2.3.6
-  gsap: 3.9.1
   nprogress: 0.2.0
   pinia: 2.0.11_typescript@4.6.2+vue@3.2.31
   prism-theme-vars: 0.2.2
@@ -3691,10 +3689,6 @@ packages:
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
     dev: true
-
-  /gsap/3.9.1:
-    resolution: {integrity: sha512-JSGVYoC6da4pIjdF/yxFU6Rz8OojOIDkbooveZlfNg0+JIoFoRruyfWAEi6R/gUeNcuOiTqUIb0gi1nCNrHf8w==}
-    dev: false
 
   /handle-thing/2.0.1:
     resolution: {integrity: sha512-9Qn4yBxelxoh2Ow62nP+Ka/kMnOXRi8BXnRaUwezLNhqelnN49xKz4F/dPP8OYLxLxq6JDtZb2i9XznUQbNPTg==}

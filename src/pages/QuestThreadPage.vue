@@ -1,7 +1,5 @@
 <script setup lang="ts">
 
-import gsap from 'gsap'
-
 import { useStuffStore } from '~/stores/stuff'
 import { currentPageNumberKey, currentPostIdKey } from '~/logic/injectKeys'
 
@@ -64,6 +62,9 @@ interface ScrollOption {
 }
 let pageToJumpTo: number | null = $ref(null)
 let jumpToPageOptions: ScrollOption | null = $ref(null)
+// TODO: 让滚动更顺畅
+// TODO: 等页面加载出来后再滚动
+// TODO: 在用户手动移动时取消
 function jumpToPage() {
     if (!pageToJumpTo) { return }
     const finalOptions = { ...{ behavior: 'smooth' }, ...jumpToPageOptions }
@@ -71,8 +72,41 @@ function jumpToPage() {
         getPageElement(pageToJumpTo)!.scrollIntoView()
     } else {
         stuffStore.isInAutoScrolling = true
-        gsap.to(window, {
-            scrollTo: getPageElement(pageToJumpTo)!.getBoundingClientRect().top + window.scrollY,
+        // 由于要记录是否正在滚动，不能直接用 `.scrollIntoView({ behavior: "smooth" })`
+
+        // TODO: 放到外边作为公共函数？
+        // https://stackoverflow.com/a/39494245
+        function scrollIntoViewSmoothly(args: { finalY: number, durationMs: DOMHighResTimeStamp, onComplete: () => void }) {
+            if (args.durationMs <= 0) {
+                window.scrollTo(window.screenX, args.finalY)
+                args.onComplete()
+                return
+            }
+
+            const startingY = window.scrollY
+            const diff = args.finalY - startingY
+            let startTs: DOMHighResTimeStamp | null = null
+
+            window.requestAnimationFrame(function step(now) {
+                if (!startTs) {
+                    startTs = now
+                } 
+
+                const pastTs = now - startTs
+                const percent = Math.min(pastTs/args.durationMs, 1)
+                window.scrollTo(window.screenX, startingY + diff * percent)
+
+                if (pastTs < args.durationMs) {
+                    window.requestAnimationFrame(step)
+                } else {
+                    window.requestAnimationFrame(args.onComplete)
+                }
+            })
+        }
+
+        scrollIntoViewSmoothly({
+            finalY: getPageElement(pageToJumpTo)!.getBoundingClientRect().top + window.scrollY,
+            durationMs: 300,
             onComplete: () => {
                 stuffStore.isInAutoScrolling = false
             }
