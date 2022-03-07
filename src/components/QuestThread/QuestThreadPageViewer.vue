@@ -15,49 +15,23 @@ let pageNumbers = $computed(() => function* () {
     }
 })
 
-// 已完成渲染的页面，按顺序从小到大，相邻的合并
-const readyPages: { start: number, end: number }[] = reactive([])
-// 在要求加载的页面范围更新后，清除范围外页面 “完成渲染” 的标记
+const pageStatuses = new Map<number, "loading" | "ready">()
 watch([toRef(props, 'pageStart'), toRef(props, 'pageEnd')], () => {
-    for (let i = 0; i < readyPages.length;) {
-        const { start, end } = readyPages[i]
-        if (end < props.pageStart || start > props.pageEnd) {
-            readyPages.splice(i, 1)
-            continue
+    for (const page of [...pageStatuses.keys()]) {
+        if (page < props.pageStart || page > props.pageEnd) {
+            pageStatuses.delete(page)
         }
-        if (start < props.pageStart) {
-            readyPages[i].start = props.pageStart
-        }
-        if (end > props.pageEnd) {
-            readyPages[i].end = props.pageEnd
-        }
-        i++
     }
-})
-watch(readyPages, () => {
-    nextTick(() => emit('updated', readyPages))
-})
+    for (let page = props.pageStart; page <= props.pageEnd; page++) {
+        if (!pageStatuses.has(page)) {
+            pageStatuses.set(page, "loading")
+        }
+    }
+}, { immediate: true })
 function addReadyPages(pageNumber: number) {
-    for (let i = 0; i < readyPages.length; i++) {
-        const { start, end } = readyPages[i]
-        if (pageNumber < start - 1) {
-            readyPages.splice(i, 0, { start: pageNumber, end: pageNumber })
-            return
-        } else if (pageNumber === start - 1) {
-            readyPages[i].start = start - 1
-            return
-        } else if (pageNumber >= start && pageNumber <= end) {
-            return
-        } else if (pageNumber === end + 1) {
-            readyPages[i].end = end + 1
-            return
-        }
-        // pageNumber > end: continue
-    }
-    // pageNumber 最大
-    readyPages.push({ start: pageNumber, end: pageNumber })
+    pageStatuses.set(pageNumber, "ready")
+    emit("updated", pageStatuses)
 }
-
 </script>
 
 <template lang="pug">

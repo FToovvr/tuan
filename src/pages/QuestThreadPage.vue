@@ -48,32 +48,32 @@ function getPageElement(page: number): HTMLElement | null {
     return document.querySelector(`#page-${page}`)
 }
 
+// 如果非 null，下次 ThreadViewer 完成更新后需要更新滚动高度并将其归位为 null
+let oldStartPageOffsetY: number | null = null
 function loadPreviousPage() {
-    const oldStartPageOffsetY = getPageElement(pageStart)!.offsetTop
+    oldStartPageOffsetY = getPageElement(pageStart)!.offsetTop
     pageStart--
-    nextTick(async () => {
-        // FIXME: 会导致位置闪一下，
-        // 如果没猜错问题所在，正确做法应该是：
-        // 内层的组件在把自动第一层引用视图固定完后再触发 @updated
-        await new Promise((r) => setTimeout(r, 5))
-        const oldStartPageOffsetYNow = getPageElement(pageStart + 1)!.offsetTop
-        const deltaTop = oldStartPageOffsetYNow - oldStartPageOffsetY
-        window.scrollBy({ top: deltaTop })
-    })
 }
 
 // 用于控制翻页控件是否允许上下翻页
-// 实际是 readyPages 应该只有一个元素
-let readyPages: { start: number, end: number }[] = reactive([])
-function onThreadViewerUpdated(_readyPages: { start: number, end: number }[]) {
-    readyPages = _readyPages
-    jumpToPage()
+let pageStatuses = $ref(new Map<number, "loading" | "ready">())
+function onThreadViewerUpdated(_pageStatuses: Map<number, "loading" | "ready">) {
+    pageStatuses = _pageStatuses
+
+    if (oldStartPageOffsetY !== null) {
+        const oldStartPageOffsetYNow = getPageElement(pageStart + 1)!.offsetTop
+        const deltaTop = oldStartPageOffsetYNow - oldStartPageOffsetY
+        window.scrollBy({ top: deltaTop })
+    }
+
+    nextTick(() => jumpToPage())
 }
 
 interface ScrollOption {
     behavior?: 'smooth' | 'auto'
 }
 let pendingJumpingToPage: { pageToJumpTo: number, jumpToPageOptions: ScrollOption | null } | null = null
+// FIXME: 需要加载上一页时会直接跳到那一页，不平滑滚动了
 function jumpToPage(pageToJumpTo: number | null = null, jumpToPageOptions: ScrollOption | null = null) {
     if (pageToJumpTo === null) {
         if (!pendingJumpingToPage) {
@@ -84,7 +84,7 @@ function jumpToPage(pageToJumpTo: number | null = null, jumpToPageOptions: Scrol
     }
 
     // 如果准备好的串页面中没有要跳转的那页，则暂不执行
-    if (readyPages.filter(({start, end}) => pageToJumpTo! >= start && pageToJumpTo! <= end).length === 0) {
+    if (pageStatuses.get(pageToJumpTo) !== "ready") {
         pendingJumpingToPage = { pageToJumpTo, jumpToPageOptions }
         return
     } else {
@@ -99,7 +99,7 @@ function jumpToPage(pageToJumpTo: number | null = null, jumpToPageOptions: Scrol
         stuffStore.isInAutoScrolling = true
         scrollIntoViewSmoothly({
             finalY: getPageElement(pageToJumpTo)!.getBoundingClientRect().top + window.scrollY,
-            durationMs: 300,
+            durationMs: 500,
             onComplete: () => {
                 stuffStore.isInAutoScrolling = false
             }
@@ -108,6 +108,7 @@ function jumpToPage(pageToJumpTo: number | null = null, jumpToPageOptions: Scrol
 }
 
 function gotoPage(toPage: number, from?: 'control') {
+    currentPageNumber = toPage
     if (toPage >= pageStart && toPage <= pageEnd) {
         // noop
     } else if (toPage === pageStart - 1) {
@@ -122,7 +123,7 @@ function gotoPage(toPage: number, from?: 'control') {
     }
     currentPostId = null
 
-    jumpToPage(toPage)
+    nextTick(() => jumpToPage(toPage))
 }
 
 // 划到网页最下方会碰到这个 div，接着触发自动加载下一页
@@ -142,8 +143,9 @@ div(class="max-w-2xl mx-auto")
     //- 浮动的页数控件
     fixed-wrapper.page-control(class="bottom-2 sm:bottom-6")
         page-number-control(
-            v-model.number="currentPageNumber" :max="maxPageNumber"
-            @update:model-value="gotoPage($event, 'control')"
+            :current-page.number="currentPageNumber" :max="maxPageNumber"
+            :page-statuses="pageStatuses"
+            @page-change-required="gotoPage($event, 'control')"
         )
 
     | {{ folder }} &gt; {{ quest }}

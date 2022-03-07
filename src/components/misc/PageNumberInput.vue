@@ -23,7 +23,7 @@ function changePage(newValue: string | number, recoverCaret = false) {
         return false
     }
 
-    emit('update:modelValue', newValue)
+    emit('update:modelValue', Number(newValue))
 
     if (caretStart) {
         nextTick(() => inputRef?.setSelectionRange(caretStart!, caretStart!))
