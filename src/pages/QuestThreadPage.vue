@@ -49,9 +49,10 @@ function getPageElement(page: number): HTMLElement | null {
 }
 
 // 如果非 null，下次 ThreadViewer 完成更新后需要更新滚动高度并将其归位为 null
-let oldStartPageOffsetY: number | null = null
+let offsetYOfOldFirstPageBeforeLoadingNewPages: number | null = null
+let scrollYAfterFirstPagesRemoved: number | null
 function loadPreviousPage() {
-    oldStartPageOffsetY = getPageElement(pageStart)!.offsetTop
+    offsetYOfOldFirstPageBeforeLoadingNewPages = getPageElement(pageStart)!.offsetTop
     pageStart--
 }
 
@@ -60,15 +61,24 @@ let pageStatuses = $ref(new Map<number, "loading" | "ready">())
 function onThreadViewerUpdated(_pageStatuses: Map<number, "loading" | "ready">) {
     pageStatuses = _pageStatuses
 
-    if (oldStartPageOffsetY !== null) {
-        const oldStartPageOffsetYNow = getPageElement(pageStart + 1)!.offsetTop
-        const deltaTop = oldStartPageOffsetYNow - oldStartPageOffsetY
-        window.scrollBy({ top: deltaTop })
+    // 处理位于最上方的串页面被去掉后的情况
+    if (scrollYAfterFirstPagesRemoved) {
+        window.scrollTo(window.scrollX, scrollYAfterFirstPagesRemoved)
+        scrollYAfterFirstPagesRemoved = null
+    }
+    // 处理串页面被添加到最上方后的情况
+    if (offsetYOfOldFirstPageBeforeLoadingNewPages !== null) {
+        const offsetYOfOldFirstPageNow = getPageElement(pageStart + 1)!.offsetTop
+        const deltaOffsetY = offsetYOfOldFirstPageNow - offsetYOfOldFirstPageBeforeLoadingNewPages
+        window.scrollBy({ top: deltaOffsetY })
+        offsetYOfOldFirstPageBeforeLoadingNewPages = null
     }
 
-    nextTick(() => jumpToPage())
+    // FIXME: safari 往上翻不滚动；以下改为 nextTick 会让 Chrome 也不滚动…
+    requestAnimationFrame(() => jumpToPage())
 }
 
+let haltScrolling: (() => void) | null = null
 interface ScrollOption {
     behavior?: 'smooth' | 'auto'
 }
@@ -91,15 +101,20 @@ function jumpToPage(pageToJumpTo: number | null = null, jumpToPageOptions: Scrol
         pendingJumpingToPage = null
     }
 
+    if (haltScrolling) {
+        haltScrolling()
+        haltScrolling = null
+    }
+
     const finalOptions = { ...{ behavior: 'smooth' }, ...jumpToPageOptions }
     if (finalOptions!.behavior === 'auto') {
         getPageElement(pageToJumpTo)!.scrollIntoView()
     } else {
         // 由于要记录是否正在滚动，不能直接用 `.scrollIntoView({ behavior: "smooth" })`
         stuffStore.isInAutoScrolling = true
-        scrollIntoViewSmoothly({
+        haltScrolling = scrollIntoViewSmoothly({
             finalY: getPageElement(pageToJumpTo)!.getBoundingClientRect().top + window.scrollY,
-            durationMs: 500,
+            durationMs: 300,
             onComplete: () => {
                 stuffStore.isInAutoScrolling = false
             }
@@ -107,7 +122,21 @@ function jumpToPage(pageToJumpTo: number | null = null, jumpToPageOptions: Scrol
     }
 }
 
-function gotoPage(toPage: number, from?: 'control') {
+let toPage: number | null = $ref(null)
+let toPageThrottle = computed(() => {
+    if (toPage === null) {
+        return 0
+    }
+    if (pageStatuses.get(toPage) !== "ready") {
+        return 500
+    }
+    return 0
+})
+throttledWatch($$(toPage), () => {
+    if (toPage === null) {
+        return
+    }
+
     currentPageNumber = toPage
     if (toPage >= pageStart && toPage <= pageEnd) {
         // noop
@@ -121,6 +150,11 @@ function gotoPage(toPage: number, from?: 'control') {
         pageEnd = toPage
         if (pageEnd > pageStart + 9) {
             // 防止性能问题的 workaround
+
+            const oldFirstPageOffsetTop = getPageElement(pageStart)!.getBoundingClientRect().top
+            const newFirstPageOffsetTop = getPageElement(pageEnd - 9)!.getBoundingClientRect().top
+            scrollYAfterFirstPagesRemoved = window.scrollY - (newFirstPageOffsetTop - oldFirstPageOffsetTop)
+
             pageStart = pageEnd - 9
         }
     } else {
@@ -131,7 +165,13 @@ function gotoPage(toPage: number, from?: 'control') {
     }
     currentPostId = null
 
-    nextTick(() => jumpToPage(toPage))
+    jumpToPage(toPage)
+
+    toPage = null
+}, { throttle: toPageThrottle })
+
+function changePage(_toPage: number, from?: 'control') {
+    toPage = _toPage
 }
 
 // 划到网页最下方会碰到这个 div，接着触发自动加载下一页
@@ -151,9 +191,9 @@ div(class="max-w-2xl mx-auto")
     //- 浮动的页数控件
     fixed-wrapper.page-control(class="bottom-2 sm:bottom-6")
         page-number-control(
-            :current-page.number="currentPageNumber" :max="maxPageNumber"
+            :current-page.number="toPage || currentPageNumber" :max="maxPageNumber"
             :page-statuses="pageStatuses"
-            @page-change-required="gotoPage($event, 'control')"
+            @page-change-required="changePage($event, 'control')"
         )
 
     | {{ folder }} &gt; {{ quest }}

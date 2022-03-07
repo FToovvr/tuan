@@ -11,14 +11,22 @@ export function scrollIntoViewSmoothly(
   if (args.durationMs <= 0) {
     window.scrollTo(window.screenX, args.finalY);
     args.onComplete();
-    return;
+    return null;
   }
 
   const startingY = window.scrollY;
   const diff = args.finalY - startingY;
   let startTs: DOMHighResTimeStamp | null = null;
 
+  let halt = false;
+  const haltFn = () => {
+    halt = true;
+  };
+
   window.requestAnimationFrame(function step(now) {
+    if (halt) {
+      return;
+    }
     if (!startTs) {
       startTs = now;
     }
@@ -33,4 +41,6 @@ export function scrollIntoViewSmoothly(
       window.requestAnimationFrame(args.onComplete);
     }
   });
+
+  return haltFn;
 }

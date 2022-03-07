@@ -15,6 +15,8 @@ interface Props {
     // 尚在加载的页面
     // 若按钮将跳转的页面位于其中，则该按钮图标将变为 “加载中”，并被禁用
     pageStatuses: Map<number, "loading" | "ready">
+
+    disabled?: boolean
 }
 const props = defineProps<Props>()
 
@@ -43,7 +45,7 @@ div.flex(w:m="auto" w:w="max" w:space="x-1" w:p="0.5" w:items="center")
     //- TODO: 加载时的 “加载中图标”
     button(
         @click="requirePageChange(currentPage - 1)"
-        :disabled="currentPage === 1 || isPreviousPageLoading"
+        :disabled="currentPage === 1 || isPreviousPageLoading || disabled"
         w:h="1.2em" w:text="2xl"
     )
         ion-caret-up
@@ -51,11 +53,12 @@ div.flex(w:m="auto" w:w="max" w:space="x-1" w:p="0.5" w:items="center")
         :modelValue="currentPage"
         :max="max"
         @update:model-value="requirePageChange($event)"
+        :disabled="disabled"
     )
     //- TODO: 加载时的 “加载中图标”
     button(
         @click="requirePageChange(currentPage + 1)"
-        :disabled="currentPage === max || isNextPageLoading"
+        :disabled="currentPage === max || isNextPageLoading || disabled"
         w:h="1.2em" w:text="2xl"
     )
         ion-caret-down

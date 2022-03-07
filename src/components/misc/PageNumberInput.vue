@@ -3,6 +3,7 @@
 interface Props {
     modelValue: number
     max: number | null
+    disabled?: boolean
 }
 const props = defineProps<Props>()
 let currentValue = $(toRef(props, 'modelValue'))
@@ -12,6 +13,9 @@ const emit = defineEmits(['update:modelValue'])
 let width = $computed(() => `${Math.max(props.max ?? 0, props.modelValue).toString().length + 1}ch`)
 
 function changePage(newValue: string | number, recoverCaret = false) {
+    if (props.disabled) {
+        return
+    }
     const caretStart = recoverCaret ? inputRef?.selectionStart : null
 
     let numValueNum = Number(newValue)
