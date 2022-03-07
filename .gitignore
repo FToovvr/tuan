@@ -3,6 +3,7 @@
 .vite-ssg-temp
 *.local
 dist
+_dist
 dist-ssr
 node_modules
 .idea/
@@ -10,3 +11,8 @@ node_modules
 
 # 数据之后会存储在单独的 Repo 中
 /public/assets/data
+tuan-data-dist
+/tuan-data
+_团数据备份
+
+/_scripts

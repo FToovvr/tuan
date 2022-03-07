@@ -13,6 +13,7 @@ import VueI18n from "@intlify/vite-plugin-vue-i18n";
 import Inspect from "vite-plugin-inspect";
 import Prism from "markdown-it-prism";
 import LinkAttributes from "markdown-it-link-attributes";
+import Copy from "rollup-plugin-copy";
 
 const markdownWrapperClasses = "prose prose-sm m-auto text-left";
 
@@ -27,6 +28,14 @@ export default defineConfig({
     },
   },
   plugins: [
+    // https://github.com/vladshcherbin/rollup-plugin-copy
+    // 将生成的 build-tuan-data 文件夹放到 dist 对应位置
+    Copy({
+      targets: [
+        { src: "tuan-data-dist", dest: "dist/assets/", rename: "tuan-data" },
+      ],
+    }),
+
     Vue({
       include: [/\.vue$/, /\.md$/],
       refTransform: true,
