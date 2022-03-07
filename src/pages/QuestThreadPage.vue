@@ -113,8 +113,16 @@ function gotoPage(toPage: number, from?: 'control') {
         // noop
     } else if (toPage === pageStart - 1) {
         pageStart = toPage
+        if (pageEnd > pageStart + 9) {
+            // 防止性能问题的 workaround
+            pageEnd = pageStart + 9
+        }
     } else if (toPage === pageEnd + 1) {
         pageEnd = toPage
+        if (pageEnd > pageStart + 9) {
+            // 防止性能问题的 workaround
+            pageStart = pageEnd - 9
+        }
     } else {
         pageStart = toPage
         pageEnd = toPage
