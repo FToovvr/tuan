@@ -1,14 +1,29 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
+import { baseUrl } from "~/env";
 
-import type { Quest } from "~/types/quest";
-import { Post, RawPostJson, rawPostToPost } from "~/types/post";
+import { Quest } from "~/logic/quest";
+import type {
+  QuestCollectionQuestRaw,
+  QuestCollectionRaw,
+} from "~/types/quest-collection";
 
 export const useStuffStore = defineStore("stuff", {
   state: () => ({
+    isInitialized: false,
+
     baseUrl: null as string | null, // XXX: 初始化后不应改变
     lfsBaseUrl: null as string | null,
 
-    quests: new Map<string, Quest>(),
+    collection: null as {
+      quests: Map</* id */ string, QuestCollectionQuestRaw>;
+      legacyPathToId: Map</* `${folder}/${quest}` */ string, string>;
+      shardsInfo: {
+        pagesPerShard: number;
+        postsPerPage: number;
+      };
+    } | null,
+
+    loadedQuests: new Map<string, Quest>(),
     currentQuest: null as Quest | null,
 
     // 最外层帖的宽度
@@ -17,15 +32,24 @@ export const useStuffStore = defineStore("stuff", {
     postToScrollTo: null as number | null,
     isInAutoScrolling: false,
   }),
+  // XXX: 这些 actions 要确保 isInAutoScrolling === true 后才可以调用
   actions: {
-    async loadCurrentQuest(folder: string, questName: string) {
-      this.currentQuest = await this.loadQuest(folder, questName);
+    async loadCurrentQuestLegacy(folder: string, questName: string) {
+      const id = this.collection?.legacyPathToId.get(`${folder}/${questName}`);
+      console.assert(id !== undefined);
+      this.loadCurrentQuest(id!);
     },
 
-    async loadQuest(folder: string, questName: string) {
-      const path = `${folder}/${questName}`;
-      if (this.quests.has(path)) {
-        return this.quests.get(path)!;
+    async loadCurrentQuest(id: string) {
+      this.currentQuest = await this.loadQuest(id);
+      console.log(this.currentQuest);
+    },
+
+    // XXX: 注意每个团只调用一次（包括 `loadCurrentQuest`, `loadCurrentQuestLegacy`）
+    async loadQuest(id: string) {
+      const folderName = Quest.convertIdToFolderName(id);
+      if (this.loadedQuests.has(id)) {
+        return this.loadedQuests.get(id)!;
       }
       if (!this.baseUrl || !this.lfsBaseUrl) {
         throw new Error(
@@ -33,30 +57,13 @@ export const useStuffStore = defineStore("stuff", {
         );
       }
 
-      let quest = $ref({
-        baseUrl: this.baseUrl,
-        lfsBaseUrl: this.lfsBaseUrl,
-        folder,
-        name: questName,
-        postOwner: "bb82mcm", // TODO
-        posts: null,
-        idFloorLookup: new Map(),
-      } as Quest);
-
-      const data = await (await fetch(`${this.baseUrl}/${path}/data.json`))
-        .json() as RawPostJson[];
-
-      const posts: Post[] = [];
-      const idFloorLookup = new Map<number, number>();
-      data.forEach((rawPost, i) => {
-        const floorNumber = i + 1;
-        posts.push(rawPostToPost(rawPost, quest, floorNumber));
-        idFloorLookup.set(rawPost.id, floorNumber);
+      let quest = await Quest.build({
+        id,
+        dataBasePath: `${this.baseUrl}/${folderName}`,
+        ...this.collection!.shardsInfo,
       });
 
-      quest.posts = posts;
-      quest.idFloorLookup = idFloorLookup;
-      this.quests.set(path, quest);
+      this.loadedQuests.set(id, quest);
 
       return quest;
     },
@@ -69,6 +76,32 @@ export function initializeStuffStore(
   const store = useStuffStore();
   store.baseUrl = args.baseUrl;
   store.lfsBaseUrl = args.lfsBaseUrl;
+
+  new Promise(async () => {
+    const collection =
+      await (await fetch(`${baseUrl}/assets/tuan-data/collection.json`))
+        .json() as QuestCollectionRaw;
+
+    const quests = new Map<string, QuestCollectionQuestRaw>();
+    const legacyPathToId = new Map<string, string>();
+    for (const quest of collection.index) {
+      quests.set(quest.id, quest);
+      if (quest.legacyPath) {
+        legacyPathToId.set(
+          `${quest.legacyPath.folder}/${quest.legacyPath.quest}`,
+          quest.id,
+        );
+      }
+    }
+
+    store.collection = {
+      quests,
+      legacyPathToId,
+      shardsInfo: collection.shardsInfo,
+    };
+
+    store.isInitialized = true;
+  });
 }
 
 if (import.meta.hot) {

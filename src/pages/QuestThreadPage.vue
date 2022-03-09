@@ -21,9 +21,13 @@ let { folder, quest, page } = $(reactive({ ...params }))
 
 const stuffStore = useStuffStore()
 
-onMounted(async () => {
-    stuffStore.loadCurrentQuest(folder, quest)
-})
+const stopWatching = watch(toRef(stuffStore, 'isInitialized'), () => {
+    if (stuffStore.isInitialized) {
+        stopWatching()
+        stuffStore.loadCurrentQuestLegacy(folder, quest)
+    }
+}, { immediate: true })
+let currentQuestPrepared = $computed(() => stuffStore.currentQuest !== null)
 
 let currentPageNumber = $ref(Number(page))
 let currentPostId: number | null = $ref(null)
@@ -39,7 +43,7 @@ throttledWatch([$$(currentPageNumber), $$(currentPostId)], () => {
 let pageStart = $ref(currentPageNumber)
 let pageEnd = $ref(currentPageNumber)
 
-let postLength = $computed(() => stuffStore.currentQuest?.posts?.length)
+let postLength = $computed(() => stuffStore.currentQuest?.postCount)
 let maxPageNumber = $computed(() => postLength ? ((((postLength ?? 1) - 1) / 19 | 0) + 1) : null)
 // 模板解析有 bug，所以单独提取出来
 let hasNextPage = $computed(() => pageEnd < (maxPageNumber ?? 0))
@@ -187,7 +191,7 @@ onMounted(() => {
 </script>
 
 <template lang="pug">
-div(class="max-w-2xl mx-auto")
+div(v-if="currentQuestPrepared" class="max-w-2xl mx-auto")
     //- 浮动的页数控件
     fixed-wrapper.page-control(class="bottom-2 sm:bottom-6")
         page-number-control(

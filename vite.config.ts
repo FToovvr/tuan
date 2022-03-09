@@ -13,7 +13,7 @@ import VueI18n from "@intlify/vite-plugin-vue-i18n";
 import Inspect from "vite-plugin-inspect";
 import Prism from "markdown-it-prism";
 import LinkAttributes from "markdown-it-link-attributes";
-import Copy from "rollup-plugin-copy";
+// import Copy from "rollup-plugin-copy";
 
 const markdownWrapperClasses = "prose prose-sm m-auto text-left";
 
@@ -28,13 +28,17 @@ export default defineConfig({
     },
   },
   plugins: [
-    // https://github.com/vladshcherbin/rollup-plugin-copy
-    // 将生成的 build-tuan-data 文件夹放到 dist 对应位置
-    Copy({
-      targets: [
-        { src: "tuan-data-dist", dest: "dist/assets/", rename: "tuan-data" },
-      ],
-    }),
+    // // https://github.com/vladshcherbin/rollup-plugin-copy
+    // // 将生成的 build-tuan-data 文件夹放到 dist 对应位置
+    // // TODO: 也许可以换成这个：https://github.com/sapphi-red/vite-plugin-static-copy
+    // Copy({
+    //   targets: [
+    //     { src: "tuan-data-dist", dest: "dist/assets/", rename: "tuan-data" },
+    //   ],
+    //   // 也不知道为什么，只有这样才能复制成功
+    //   // https://github.com/vitejs/vite/issues/1231#issuecomment-753549857
+    //   hook: "writeBundle",
+    // }),
 
     Vue({
       include: [/\.vue$/, /\.md$/],

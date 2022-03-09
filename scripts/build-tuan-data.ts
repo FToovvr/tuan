@@ -13,8 +13,10 @@ import yaml from "js-yaml";
 import binarySearch from "binary-search";
 import Papa from "papaparse";
 
-const outPath = "tuan-data-dist";
-const tuanDataBasePath = `${outPath}/tuan-collection`;
+const outPath = "public/assets/tuan-data";
+
+const postsPerPage = 19;
+const pagesPerShard = 20;
 
 async function main() {
   // 总之目前先简单粗暴地把之前生成的记录删掉
@@ -35,14 +37,13 @@ async function main() {
     return true;
   });
 
-  await fsP.mkdir(tuanDataBasePath, { recursive: true });
   const tuanCollectionText = JSON.stringify(
-    { index: tuanCollection, shardsInfo: { postsPerShard: 20 * 19 } },
+    { index: tuanCollection, shardsInfo: { pagesPerShard, postsPerPage } },
     null,
     "\t",
   );
   await fsP.writeFile(
-    `${tuanDataBasePath}/collection.json`,
+    `${outPath}/collection.json`,
     tuanCollectionText,
   );
 }
@@ -55,6 +56,8 @@ interface TuanInfo {
 
   name: string;
   po: string | string[] | null;
+
+  "legacy-path"?: { folder: string; quest: string };
 }
 
 interface TuanInfoFinal {
@@ -64,6 +67,8 @@ interface TuanInfoFinal {
   postCount: number;
   // 这些数据（包括上面的 `postCount`）足以推导出都有哪些碎片
   // shardsInfo: { postsPerShard: number };
+
+  legacyPath?: { folder: string; quest: string };
 }
 
 // 团的碎片，可以包含许多页的内容
@@ -93,17 +98,25 @@ async function buildTuan(basePath: string) {
   const _rawThread = await fsP.readFile(rawThreadPath, "utf8");
   const rawThread = JSON.parse(_rawThread.toString()) as Post[];
 
-  const tuanFolderPath = `${tuanDataBasePath}/${info.id}`;
+  const idInPath = (() => {
+    const parts = info.id.split(":");
+    const last = parts.splice(parts.length - 1, 1);
+    return parts.map((x) => `[${x}]`).join("") + last;
+  })();
+  const tuanFolderPath = `${outPath}/${idInPath}`;
   await fsP.mkdir(tuanFolderPath, { recursive: true });
 
   const shards: TuanShard[] = [];
   const refShardMap = new Map<number, number>();
   // 将整个串切成碎片
   // 每个碎片包含 “20 页 * 19 帖/页” 的内容
-  for (let i = 0; i < rawThread.length; i += 20 * 19) {
+  for (let i = 0; i < rawThread.length; i += pagesPerShard * postsPerPage) {
     const shard: TuanShard = {
-      offsetRange: { from: i, to: i + 20 * 19 - 1 },
-      posts: rawThread.slice(i, i + 20 * 19),
+      offsetRange: {
+        from: i,
+        to: Math.min(i + pagesPerShard * postsPerPage, rawThread.length) - 1,
+      },
+      posts: rawThread.slice(i, i + pagesPerShard * postsPerPage),
       refIndex: {},
     };
     shards.push(shard);
@@ -136,7 +149,7 @@ async function buildTuan(basePath: string) {
 
     const shardFilePath = path.join(
       shardsPath,
-      `${i}:${shard.offsetRange.from}-${shard.offsetRange.to}.csv`,
+      `[${i}]${shard.offsetRange.from}-${shard.offsetRange.to}.csv`,
     );
     const postsCsv = Papa.unparse(shard.posts, {
       columns: [
@@ -150,7 +163,7 @@ async function buildTuan(basePath: string) {
         "name",
       ],
     });
-    await fsP.writeFile(shardFilePath, postsCsv);
+    await fsP.writeFile(shardFilePath, "\uFEFF" + postsCsv);
   }
 
   const finalInfo: TuanInfoFinal = {
@@ -160,10 +173,12 @@ async function buildTuan(basePath: string) {
 
     postCount: rawThread.length,
     // 这些数据（包括上面的 `postCount`）足以推导出都有哪些碎片
-    // shardsInfo: {
-    //   postsPerShard: 20 * 19,
-    // },
+    // shardsInfo: { pagesPerShard, postsPerPage },
   };
+
+  if (info["legacy-path"]) {
+    finalInfo.legacyPath = info["legacy-path"];
+  }
 
   const finalInfoText = JSON.stringify(finalInfo, null, "\t");
   await fsP.writeFile(path.join(tuanFolderPath, "tuan.json"), finalInfoText);

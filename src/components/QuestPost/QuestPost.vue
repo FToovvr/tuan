@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import type { Post } from "~/types/post"
+import type { Post } from "~/logic/post"
 import type { DisplayStatus } from "~/types/post-ui"
 import { postBackgroundColor } from "~/logic/backgroundColor"
 import { currentPageNumberKey, currentPostIdKey, pageNumberKey } from "~/logic/injectKeys"

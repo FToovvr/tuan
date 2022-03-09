@@ -5,12 +5,8 @@ import QuestPostLoader from "../QuestPost/QuestPostLoader.vue";
 import { useStuffStore } from "~/stores/stuff";
 import zIndexes from "~/logic/zIndexes"
 import { pageNumberKey } from "~/logic/injectKeys";
-
-interface PropOffset {
-    type: 'offset'
-    offset: number
-    count: number
-}
+import { rawPostToPost } from "~/logic/post";
+import type { Post } from "~/logic/post";
 
 interface PropPage {
     type: 'page'
@@ -19,7 +15,7 @@ interface PropPage {
 }
 
 interface Props {
-    props: PropOffset | PropPage
+    props: PropPage
 }
 const _outerProps = defineProps<Props>()
 
@@ -28,32 +24,25 @@ const emit = defineEmits(['ready'])
 let pageNumber = $computed(() => _outerProps.props.type === 'page' ? _outerProps.props.page : null)
 provide(pageNumberKey, $$(pageNumber))
 
-let computedProps = $computed(() => {
-    const _props = toRef(_outerProps, 'props')
-    let props = $(_props)
-    if (props.type === 'offset') {
-        return {
-            ...props,
-            description: `${props.offset + 1}楼 ~ ${props.offset + props.count}楼`,
-        }
-    } else {
-        return {
-            offset: (props.page - 1) * (props.pageSize ?? 19),
-            count: props.pageSize ?? 19,
-            description: `${props.page}页`,
-        }
-    }
-})
+let description = $computed(() => _outerProps.props.type === 'page' ? `${_outerProps.props.page}页` : "?")
 
 const stuffStore = useStuffStore()
 
-let posts = computed(() => {
-    if (!stuffStore.currentQuest || !stuffStore.currentQuest.posts) {
-        return []
-    }
-    return stuffStore.currentQuest.posts
-        .slice(computedProps.offset, computedProps.offset + computedProps.count)
-})
+// TODO: 未加载完成时应为 null，对应显示 “加载中” 提示
+// TODO: 当一页未加载完成时，应该禁用自动加载下一页的功能
+let posts: Post[] = $ref([])
+watch(toRef(_outerProps, 'props'), async () => {
+    const currentQuest = stuffStore.currentQuest!
+    
+    const rawPosts = await currentQuest.getPage(_outerProps.props.page)
+    posts = rawPosts.map(rawPost =>
+        rawPostToPost(
+            rawPost,
+            currentQuest,
+            currentQuest.postFloorLookup.get(rawPost.id)!,
+        )
+    )
+}, { immediate: true })
 
 let postListRef = $ref(null)
 onMounted(() => {
@@ -83,7 +72,7 @@ onMounted(() => {
     //- 页的分割线，显示类似 “XX页” 或者 “XX楼 ~ XX楼” 这样的信息
     .post-page-bar
         bar-with-text
-            span(w:font="mono") {{ computedProps.description }}
+            span(w:font="mono") {{ description }}
 
     div(w:h="2")
 
