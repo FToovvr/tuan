@@ -19,7 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
     displayStatus: 'open'
 })
 
-const emit = defineEmits(['expand'])
+const emit = defineEmits(['expand', 'ready'])
 
 let isInsideCollapsed = $(inject(isInsideCollapsedKey, ref(false)))
 let innerIsInsideCollapsed = $computed(() => isInsideCollapsed || props.displayStatus === 'collapsed')
@@ -32,6 +32,7 @@ let post: Post | 'lost' | 'loading' = $ref('loading')
 watch(props, () => {
     if (props.post) {
         post = props.post
+        emit('ready')
         return
     }
     new Promise(async () => {
@@ -40,10 +41,11 @@ watch(props, () => {
             //- TODO: 处理 post 不存在的情况
             console.debug(`串 ${props.postId} 不存在于数据中`)
             post = 'lost'
-            return
+        } else {
+            const currentQuest = stuffStore.currentQuest!
+            post = rawPostToPost(_post, currentQuest, currentQuest.postFloorLookup.get(_post.id)!)
         }
-        const currentQuest = stuffStore.currentQuest!
-        post = rawPostToPost(_post, currentQuest, currentQuest.postFloorLookup.get(_post.id)!)
+        nextTick(() => emit('ready'))
     })
 }, { immediate: true })
 

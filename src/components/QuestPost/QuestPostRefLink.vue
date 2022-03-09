@@ -86,13 +86,15 @@ let {
     }
 }($$(refPostAnchorRef), $$(refPostRef), 100))
 
+let isPostReady = $ref(false)
+
 // 帖当前的高度（不包含由于折叠被隐藏的高度）
 let refPostHeight = $ref(0)
 let refPostWidth = $ref(0)
 // 帖整体的高度（包含由于折叠被隐藏的高度）
 let refPostFullHeight = $ref(0)
-watch($$(refPostRef), () => {
-    if (!refPostRef) { return }
+watch([$$(refPostRef), $$(isPostReady)], () => {
+    if (!refPostRef || !isPostReady) { return }
 
     const fullEl = refPostRef.querySelector('.quest-post-content-wrapper') as HTMLElement | null
     for (const { heightRef, widthRef, el } of [
@@ -106,7 +108,7 @@ watch($$(refPostRef), () => {
             if (widthRef) { widthRef.value = entries[0].contentRect.width }
         })
     }
-})
+}, { immediate: true })
 
 // TODO: 应该总共只计算一次，而不是每个组件实例都计算一次
 // TODO: 高度的值应该固定在某处，而不是同时硬编码在这里和 QuestPost.vue 中 `article.container` 的 `:class` 绑定中
@@ -215,6 +217,7 @@ keep-alive
                 quest-post-loader(
                     :post-id="postId" :nest-level="nestLevel" :display-status="displayStatus"
                     @expand="onClick('link')"
+                    @ready="isPostReady = true"
                 )
                     template(#head-left)
                         .inline-block.relative
