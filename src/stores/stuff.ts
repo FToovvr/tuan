@@ -47,7 +47,6 @@ export const useStuffStore = defineStore("stuff", {
 
     async loadCurrentQuest(id: string) {
       this.currentQuest = await this.loadQuest(id);
-      console.log(this.currentQuest);
     },
 
     // XXX: 注意每个团只调用一次（包括 `loadCurrentQuest`, `loadCurrentQuestLegacy`）
