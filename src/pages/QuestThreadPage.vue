@@ -182,7 +182,8 @@ function changePage(_toPage: number, from?: 'control') {
 let autoLoadNextPageSentinelDiv: HTMLElement | null = $ref(null)
 onMounted(() => {
     useIntersectionObserver($$(autoLoadNextPageSentinelDiv), ([{ intersectionRatio }]) => {
-        if (intersectionRatio > 0) {
+        const canAutoLoadNextPage = pageStatuses.get(pageEnd) === 'ready'
+        if (canAutoLoadNextPage && intersectionRatio > 0) {
             pageEnd++
         }
     }, { threshold: [0] })

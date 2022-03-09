@@ -51,16 +51,12 @@ onMounted(() => {
     })
 })
 
-let mountedFirstTime =true
 // 在内容渲染后发出 “页面准备完成” 的事件，以便其他组件处理有关翻页的事宜
 // QuestThreadPageViewer 每次变更页面范围都会触发一次，但实际只需通知一次
-// XXX: onMounted 不会在 SSR 调用，不过暂时也不需要考虑这些，
-//      再说，SSR 时也不需要考虑翻页的事
 // FIXME: 应该等自动展开的引用视图展开后再发出
-onMounted(() => {
-    if (mountedFirstTime) {
-        emit('ready')
-        mountedFirstTime = false
+watch($$(posts), () => {
+    if (posts) {
+        nextTick(() => emit('ready'))
     }
 })
 
