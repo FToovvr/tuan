@@ -74,6 +74,7 @@ watch($$(posts), () => {
 
     //- 页中的各条帖子
     .post-list(
+        v-if="posts"
         ref="postListRef"
         w:space="y-1"
     )
@@ -82,4 +83,7 @@ watch($$(posts), () => {
                 :post="post"
                 :style="{ zIndex: zIndexes.post + posts.length - i }"
             )
+    div(v-else)
+        //- TODO: 美化
+        span 页面加载中…
 </template>
