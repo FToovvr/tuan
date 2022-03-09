@@ -1,2 +1,2 @@
-export const isProduction = import.meta.env.MODE === 'production'
-export const baseUrl = isProduction ? '/tuan' : ''
+export const isProduction = import.meta.env.MODE === "production";
+export const assetBaseUrl = isProduction ? "/tuan" : "";

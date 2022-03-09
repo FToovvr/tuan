@@ -43,7 +43,7 @@ export function rawPostToPost(
       const fullImageName = `${raw.attachment_base}${raw.attachment_extension}`;
       const imageName = fullImageName.split("/")[1];
       const folderName = Quest.convertIdToFolderName(quest.id);
-      return `${stuffStore.lfsBaseUrl}/${folderName}/attachments/${imageName}`;
+      return `${stuffStore.lfsAssetBaseUrl}/${folderName}/attachments/${imageName}`;
     })(),
   } as Post;
 }

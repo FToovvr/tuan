@@ -12,21 +12,20 @@ import FixedWrapper from '~/components/misc/FixedWrapper.vue'
 const route = useRoute()
 
 interface Params {
-    folder: string
-    quest: string
+    id: string
     page: string
 }
 const params = route.params as unknown as Params
-let { folder, quest, page } = $(reactive({ ...params }))
+let { id, page } = $(reactive({ ...params }))
 
 const stuffStore = useStuffStore()
 
-const stopWatching = watch(toRef(stuffStore, 'isInitialized'), () => {
-    if (stuffStore.isInitialized) {
-        stopWatching()
-        stuffStore.loadCurrentQuestLegacy(folder, quest)
-    }
-}, { immediate: true })
+new Promise(async () => {
+    await until(toRef(stuffStore, 'isInitialized')).toBe(true)
+
+        stuffStore.loadCurrentQuest(id)
+})
+
 let currentQuestPrepared = $computed(() => stuffStore.currentQuest !== null)
 
 let currentPageNumber = $ref(Number(page))
@@ -200,7 +199,8 @@ div(v-if="currentQuestPrepared" class="max-w-2xl mx-auto")
             @page-change-required="changePage($event, 'control')"
         )
 
-    | {{ folder }} &gt; {{ quest }}
+    //- | {{ id.split(":").join(" > ") }}
+    | {{ stuffStore.currentQuest?.name }}
     hr
 
     //- 用于加载上一页的按钮

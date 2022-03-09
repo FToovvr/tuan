@@ -1,8 +1,13 @@
 import { RouteRecordRaw } from "vue-router";
-import { baseUrl } from "./env";
+import { assetBaseUrl } from "./env";
 
 import Page from "./pages/QuestThreadPage.vue";
+import PageLegacy from "./pages/QuestThreadPageLegacy.vue";
 
 export default [
-  { path: `${baseUrl}/folder-:folder/quest-:quest/:page`, component: Page },
+  { path: `${assetBaseUrl}/quests/:id/pages/:page`, component: Page },
+  {
+    path: `${assetBaseUrl}/folder-:folder/quest-:quest/:page`,
+    component: PageLegacy,
+  },
 ] as RouteRecordRaw[];

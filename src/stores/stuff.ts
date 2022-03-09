@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { baseUrl } from "~/env";
+import { assetBaseUrl } from "~/env";
 
 import { Quest } from "~/logic/quest";
 import type {
@@ -11,8 +11,9 @@ export const useStuffStore = defineStore("stuff", {
   state: () => ({
     isInitialized: false,
 
-    baseUrl: null as string | null, // XXX: 初始化后不应改变
-    lfsBaseUrl: null as string | null,
+    entrypoint: null as string | null,
+    assetBaseUrl: null as string | null, // XXX: 初始化后不应改变
+    lfsAssetBaseUrl: null as string | null,
 
     collection: null as {
       quests: Map</* id */ string, QuestCollectionQuestRaw>;
@@ -35,9 +36,13 @@ export const useStuffStore = defineStore("stuff", {
   // XXX: 这些 actions 要确保 isInAutoScrolling === true 后才可以调用
   actions: {
     async loadCurrentQuestLegacy(folder: string, questName: string) {
-      const id = this.collection?.legacyPathToId.get(`${folder}/${questName}`);
+      const id = this.convertLegacyPathToId(folder, questName);
       console.assert(id !== undefined);
       this.loadCurrentQuest(id!);
+    },
+
+    convertLegacyPathToId(folder: string, questName: string) {
+      return this.collection?.legacyPathToId.get(`${folder}/${questName}`);
     },
 
     async loadCurrentQuest(id: string) {
@@ -51,15 +56,15 @@ export const useStuffStore = defineStore("stuff", {
       if (this.loadedQuests.has(id)) {
         return this.loadedQuests.get(id)!;
       }
-      if (!this.baseUrl || !this.lfsBaseUrl) {
+      if (!this.assetBaseUrl || !this.lfsAssetBaseUrl) {
         throw new Error(
-          `baseUrl(${this.baseUrl}) or lfsBaseUrl(${this.lfsBaseUrl}) is null`,
+          `baseUrl(${this.assetBaseUrl}) or lfsBaseUrl(${this.lfsAssetBaseUrl}) is null`,
         );
       }
 
       let quest = await Quest.build({
         id,
-        dataBasePath: `${this.baseUrl}/${folderName}`,
+        dataBasePath: `${this.assetBaseUrl}/${folderName}`,
         ...this.collection!.shardsInfo,
       });
 
@@ -71,15 +76,20 @@ export const useStuffStore = defineStore("stuff", {
 });
 
 export function initializeStuffStore(
-  args: { baseUrl: string; lfsBaseUrl: string },
+  args: {
+    entrypoint: string;
+    assetBaseUrl: string;
+    lfsAssetBaseUrl: string;
+  },
 ) {
   const store = useStuffStore();
-  store.baseUrl = args.baseUrl;
-  store.lfsBaseUrl = args.lfsBaseUrl;
+  store.entrypoint = args.entrypoint;
+  store.assetBaseUrl = args.assetBaseUrl;
+  store.lfsAssetBaseUrl = args.lfsAssetBaseUrl;
 
   new Promise(async () => {
     const collection =
-      await (await fetch(`${baseUrl}/assets/tuan-data/collection.json`))
+      await (await fetch(`${assetBaseUrl}/assets/tuan-data/collection.json`))
         .json() as QuestCollectionRaw;
 
     const quests = new Map<string, QuestCollectionQuestRaw>();
