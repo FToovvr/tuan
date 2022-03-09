@@ -11,7 +11,10 @@ export default [
   },
   {
     path: `${entrypoint}/quests/:id`,
-    redirect: (to) => ({ ...to, path: `${to.path}/pages/1` }),
+    redirect: (to) => {
+      const toPathWithSlash = to.path.endsWith("/") ? to.path : `${to.path}/`;
+      return { ...to, path: `${toPathWithSlash}pages/1` };
+    },
   },
   {
     path: `${entrypoint}/folder-:folder/quest-:quest/:page`,
