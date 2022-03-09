@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from "pinia";
-import { assetBaseUrl } from "~/env";
+import { entrypoint } from "~/env";
 
 import { Quest } from "~/logic/quest";
 import type {
@@ -89,7 +89,7 @@ export function initializeStuffStore(
 
   new Promise(async () => {
     const collection =
-      await (await fetch(`${assetBaseUrl}/assets/tuan-data/collection.json`))
+      await (await fetch(`${entrypoint}/assets/tuan-data/collection.json`))
         .json() as QuestCollectionRaw;
 
     const quests = new Map<string, QuestCollectionQuestRaw>();

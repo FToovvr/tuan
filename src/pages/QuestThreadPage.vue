@@ -17,6 +17,7 @@ interface Params {
 }
 const params = route.params as unknown as Params
 let { id, page } = $(reactive({ ...params }))
+page = page ?? "1"
 
 const stuffStore = useStuffStore()
 
