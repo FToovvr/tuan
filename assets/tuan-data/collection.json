@@ -1,0 +1,64 @@
+{
+	"index": [
+		{
+			"id": "Vth:ultraman",
+			"name": "奥特曼团",
+			"po": "VthGxGS",
+			"postCount": 36029,
+			"legacyPath": {
+				"folder": "Vth",
+				"quest": "ultraman"
+			}
+		},
+		{
+			"id": "mVE:san-mesozoico",
+			"name": "圣中城",
+			"po": "mVEbuXy",
+			"postCount": 2148,
+			"legacyPath": {
+				"folder": "mVE",
+				"quest": "圣中城"
+			}
+		},
+		{
+			"id": "bb82:pokemon",
+			"name": "宝可梦团",
+			"po": "bb82mcm",
+			"postCount": 7087,
+			"legacyPath": {
+				"folder": "bb82",
+				"quest": "pokemon"
+			}
+		},
+		{
+			"id": "bb82:digimon",
+			"name": "数码宝贝团",
+			"po": "bb82mcm",
+			"postCount": 8449,
+			"legacyPath": {
+				"folder": "bb82",
+				"quest": "digimon"
+			}
+		},
+		{
+			"id": "dt:ergou:ergou-gaozhong-rizhi:1",
+			"name": "二狗的高中日志 一周目",
+			"po": "BiHpTOD",
+			"postCount": 1400,
+			"legacyPath": {
+				"folder": "dt",
+				"quest": "ergo_gaozhong_rizhi_1"
+			}
+		},
+		{
+			"id": "common:jizhi",
+			"name": "机制串",
+			"po": null,
+			"postCount": 60549
+		}
+	],
+	"shardsInfo": {
+		"pagesPerShard": 20,
+		"postsPerPage": 19
+	}
+}

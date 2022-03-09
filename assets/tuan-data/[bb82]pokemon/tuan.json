@@ -1,0 +1,10 @@
+{
+	"id": "bb82:pokemon",
+	"name": "宝可梦团",
+	"po": "bb82mcm",
+	"postCount": 7087,
+	"legacyPath": {
+		"folder": "bb82",
+		"quest": "pokemon"
+	}
+}

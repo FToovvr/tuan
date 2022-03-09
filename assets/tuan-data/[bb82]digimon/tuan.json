@@ -1,0 +1,10 @@
+{
+	"id": "bb82:digimon",
+	"name": "数码宝贝团",
+	"po": "bb82mcm",
+	"postCount": 8449,
+	"legacyPath": {
+		"folder": "bb82",
+		"quest": "digimon"
+	}
+}
