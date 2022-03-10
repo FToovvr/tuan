@@ -12,12 +12,14 @@ interface Props {
     postId: number
 
     // 处于第几层嵌套，最外层的帖为 0
-    nestLevel: number
+    nestLevel: string
     // 属于同一层的第几个引用链接
-    siblingOrder: number
+    siblingOrder: string
 }
 const props = defineProps<Props>()
 let postId = $(toRef(props, 'postId'))
+let nestLevel = $computed(() => Number(props.nestLevel))
+let siblingOrder = $computed(() => Number(props.siblingOrder))
 
 let refRelativeDiv = $(inject(postContentDivKey))
 
@@ -30,8 +32,8 @@ let maxWidth = $computed(() => {
     const indentSpace = '0.75rem' // TODO: 不该 hardcode
     const rootWidth = `${stuffStore.rootPostWidth!}px`
 
-    const leftSpace = `(${indentSpace} * ${props.nestLevel + 1})`
-    const rightSpace = `(0.2em * ${props.nestLevel})`
+    const leftSpace = `(${indentSpace} * ${nestLevel + 1})`
+    const rightSpace = `(0.2em * ${nestLevel})`
 
     return `calc(${rootWidth} - ${leftSpace} - ${rightSpace})`
 })
@@ -174,7 +176,7 @@ watch($$(refPostFullHeight), () => {
 
 // 让第一层引用视图自动固定并折叠
 onMounted(() => {
-    if (props.nestLevel === 1) {
+    if (nestLevel === 1) {
         isPinned = true
         nextTick(() => {
             if (isCollapsible) {
@@ -188,7 +190,7 @@ onMounted(() => {
 
 let siblingRefLinkCount = $(inject(siblingRefLinkCountKey))
 // @ts-ignore The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
-let refPostZIndex = $computed(() => zIndexes.post + (siblingRefLinkCount - props.siblingOrder))
+let refPostZIndex = $computed(() => zIndexes.post + (siblingRefLinkCount - siblingOrder))
 
 </script>
 
