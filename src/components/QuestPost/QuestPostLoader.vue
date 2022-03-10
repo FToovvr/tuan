@@ -9,7 +9,6 @@ import { isInsideCollapsedKey } from "~/logic/injectKeys"
 import QuestPostFrame from "./QuestPostFrame.vue"
 
 interface Props {
-    post?: Post // 帖内容或帖号
     postId?: number
 
     nestLevel?: number
@@ -29,25 +28,16 @@ const stuffStore = useStuffStore()
 
 let post: Post | 'lost' | 'loading' = $ref('loading')
 
-watch(props, () => {
-    if (props.post) {
-        post = props.post
-        emit('ready')
-        return
+new Promise(async () => {
+    const _post = await stuffStore.currentQuest!.getRefPost(props.postId!)
+    if (!_post) {
+        post = 'lost'
+    } else {
+        const currentQuest = stuffStore.currentQuest!
+        post = rawPostToPost(_post, currentQuest, currentQuest.postFloorLookup.get(_post.id)!)
     }
-    new Promise(async () => {
-        const _post = await stuffStore.currentQuest!.getRefPost(props.postId!)
-        if (!_post) {
-            //- TODO: 处理 post 不存在的情况
-            console.debug(`串 ${props.postId} 不存在于数据中`)
-            post = 'lost'
-        } else {
-            const currentQuest = stuffStore.currentQuest!
-            post = rawPostToPost(_post, currentQuest, currentQuest.postFloorLookup.get(_post.id)!)
-        }
-        nextTick(() => emit('ready'))
-    })
-}, { immediate: true })
+    nextTick(() => emit('ready'))
+})
 
 </script>
 
