@@ -41,6 +41,12 @@
 			}
 		},
 		{
+			"id": "tftk:cyberpunk",
+			"name": "赛博朋克多人",
+			"po": "tftk7WH",
+			"postCount": 15001
+		},
+		{
 			"id": "dt:ergou:ergou-gaozhong-rizhi:1",
 			"name": "二狗的高中日志 一周目",
 			"po": "BiHpTOD",
@@ -49,6 +55,12 @@
 				"folder": "dt",
 				"quest": "ergo_gaozhong_rizhi_1"
 			}
+		},
+		{
+			"id": "OBr:game",
+			"name": "国产游戏",
+			"po": "OBrw7Cn",
+			"postCount": 2668
 		},
 		{
 			"id": "common:jizhi",
