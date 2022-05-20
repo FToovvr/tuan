@@ -11,6 +11,12 @@
 			}
 		},
 		{
+			"id": "common:ultrashort-1-voting",
+			"name": "第一届超短团大赛——投票评审环节",
+			"po": "AxPkv3o",
+			"postCount": 94
+		},
+		{
 			"id": "mVE:san-mesozoico",
 			"name": "圣中城",
 			"po": "mVEbuXy",
@@ -31,6 +37,12 @@
 			}
 		},
 		{
+			"id": "common:ultrashort-2-voting",
+			"name": "第二届超短团大赛——投票评审环节",
+			"po": "AxPkv3o",
+			"postCount": 100
+		},
+		{
 			"id": "bb82:digimon",
 			"name": "数码宝贝团",
 			"po": "bb82mcm",
@@ -41,10 +53,22 @@
 			}
 		},
 		{
+			"id": "common:best-quests-2021",
+			"name": "2021年度高质量团总结投票",
+			"po": "7On6kzJ",
+			"postCount": 267
+		},
+		{
 			"id": "tftk:cyberpunk",
 			"name": "赛博朋克多人",
 			"po": "tftk7WH",
 			"postCount": 15001
+		},
+		{
+			"id": "common:best-quests-2021-first-half",
+			"name": "2021上半年度高质量团总结投票",
+			"po": "7On6kzJ",
+			"postCount": 94
 		},
 		{
 			"id": "dt:ergou:ergou-gaozhong-rizhi:1",
