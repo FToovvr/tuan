@@ -71,6 +71,12 @@
 			"postCount": 94
 		},
 		{
+			"id": "VtS:bai-he",
+			"name": "百合团",
+			"po": "efEMppK",
+			"postCount": 225
+		},
+		{
 			"id": "dt:ergou:ergou-gaozhong-rizhi:1",
 			"name": "二狗的高中日志 一周目",
 			"po": "BiHpTOD",
@@ -91,6 +97,12 @@
 			"name": "阖壶鬼团",
 			"po": "Ig7nipt",
 			"postCount": 11908
+		},
+		{
+			"id": "SPS:mao-mao-town",
+			"name": "猫猫小镇",
+			"po": "SPSiyKY",
+			"postCount": 607
 		},
 		{
 			"id": "common:jizhi",
