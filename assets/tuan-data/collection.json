@@ -59,6 +59,12 @@
 			"postCount": 267
 		},
 		{
+			"id": "Pps:xun-long",
+			"name": "驯龙团",
+			"po": "PpsMBwW",
+			"postCount": 2351
+		},
+		{
 			"id": "tftk:cyberpunk",
 			"name": "赛博朋克多人",
 			"po": "tftk7WH",
@@ -75,6 +81,12 @@
 			"name": "神选团",
 			"po": "FKxbfrY",
 			"postCount": 37015
+		},
+		{
+			"id": "dt:ergou",
+			"name": "二狗",
+			"po": "DtspYIv",
+			"postCount": 5553
 		},
 		{
 			"id": "common:best-quests-2021-first-half",
